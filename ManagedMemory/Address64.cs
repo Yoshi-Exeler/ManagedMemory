@@ -20,7 +20,7 @@ namespace ManagedMemory
             return address;
         }
 
-        public IntPtr getAddressAsPointer()
+        public IntPtr getAsPointer()
         {
             return (IntPtr)address;
         }
