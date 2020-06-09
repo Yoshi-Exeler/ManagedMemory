@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace ManagedMemory
 {
@@ -44,6 +45,35 @@ namespace ManagedMemory
             long numWritten = 0;
             bool flag = WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten);
             WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, flNewProtect, out flNewProtect);
+        }
+
+        public Address64 getModuleBase(string name)
+        {
+            foreach(ProcessModule pm in managedProcess.Modules)
+            {
+                if (pm.ModuleName == name) return new Address64(pm.BaseAddress);
+            }
+            return null;
+        }
+
+        public ArrayList getLoadedModuleNames()
+        {
+            ArrayList res = new ArrayList();
+            foreach(ProcessModule pm in managedProcess.Modules)
+            {
+                res.Add(pm.ModuleName);
+            }
+            return res;
+        }
+
+        public ProcessModuleCollection getLoadedModules()
+        {
+            return managedProcess.Modules;
+        }
+
+        public int getPid()
+        {
+            return managedProcess.Id;
         }
 
         public void WriteInt32(Address64 adr,int val)

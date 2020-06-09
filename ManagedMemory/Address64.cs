@@ -14,6 +14,11 @@ namespace ManagedMemory
         {
             address = adr;
         }
+        public Address64(IntPtr adr)
+        {
+            address = (long)adr;
+        }
+
 
         public long getAddress()
         {
