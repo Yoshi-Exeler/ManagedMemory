@@ -9,7 +9,7 @@ using System.Collections;
 
 namespace ManagedMemory
 {
-    class ProcessInterface
+    public class ProcessInterface
     {
         private Process managedProcess;
         private IntPtr handle;
@@ -18,8 +18,8 @@ namespace ManagedMemory
         {
             Process[] procs = Process.GetProcessesByName(name);
             if (procs.Length != 1) throw new Exception("Process is not unique or does not exist");
+            managedProcess = procs[0];
             handle = api_OpenProcess(managedProcess.Id);
-
         }
 
         private IntPtr api_OpenProcess(int pid)
@@ -49,7 +49,7 @@ namespace ManagedMemory
 
         public Address64 getModuleBase(string name)
         {
-            foreach(ProcessModule pm in managedProcess.Modules)
+            foreach (ProcessModule pm in managedProcess.Modules)
             {
                 if (pm.ModuleName == name) return new Address64(pm.BaseAddress);
             }
@@ -59,7 +59,7 @@ namespace ManagedMemory
         public ArrayList getLoadedModuleNames()
         {
             ArrayList res = new ArrayList();
-            foreach(ProcessModule pm in managedProcess.Modules)
+            foreach (ProcessModule pm in managedProcess.Modules)
             {
                 res.Add(pm.ModuleName);
             }
@@ -76,7 +76,7 @@ namespace ManagedMemory
             return managedProcess.Id;
         }
 
-        public void WriteInt32(Address64 adr,int val)
+        public void WriteInt32(Address64 adr, int val)
         {
             api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }

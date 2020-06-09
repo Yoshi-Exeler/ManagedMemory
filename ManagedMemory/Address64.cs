@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ManagedMemory
 {
-    class Address64
+    public class Address64
     {
         private long address;
 
@@ -52,7 +52,7 @@ namespace ManagedMemory
 
         public override string ToString()
         {
-            return Convert.ToString(address, 16);
+            return "0x"+Convert.ToString(address, 16);
         }
     }
 }

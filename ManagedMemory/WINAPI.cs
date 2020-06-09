@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace ManagedMemory
 {
-    class WINAPI
+    public class WINAPI
     {
         [Flags]
         public enum ProcessAccessFlags : uint

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ManagedMemory
 {
-    class Pointer
+    public class Pointer
     {
         private Address64 source;
         private Address64 destination;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ManagedMemory
 {
-    class ExternalVariable
+    public class ExternalVariable
     {
         private Address64 address;
         private ProcessInterface callback;

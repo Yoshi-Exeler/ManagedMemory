@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace ManagedMemory
 {
-    class PointerPath
+    public class PointerPath
     {
         private string baseModule;
         private Address64 baseModuleAddress;
         private int baseOffset;
         private int[] pathOffsets;
         private int destinationOffset;
-        private Address64 destination;
         private ProcessInterface callback;
 
         public PointerPath(string baseModule,int baseOffset,int[] pathOffsets,int destinationOffset,ProcessInterface callback)
@@ -22,6 +21,7 @@ namespace ManagedMemory
             this.pathOffsets = pathOffsets;
             this.destinationOffset = destinationOffset;
             this.callback = callback;
+            this.baseOffset = baseOffset;
             baseModuleAddress = callback.getModuleBase(baseModule);
             if (baseModuleAddress == null) throw new InvalidOperationException("the specified base module does not exist");
         }
