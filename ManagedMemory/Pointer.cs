@@ -14,6 +14,7 @@ namespace ManagedMemory
 
         public Pointer(Address64 src, ProcessInterface callback)
         {
+            this.callback = callback;
             source = src;
             destination = new Address64(callback.ReadInt64(source));
         }
