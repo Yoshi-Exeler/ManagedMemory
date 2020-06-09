@@ -17,6 +17,11 @@ namespace ManagedMemory
             address = adr;
         }
 
+        public Address64 getAddress()
+        {
+            return address;
+        }
+
         public int GetAsInt32()
         {
             return callback.ReadInt32(address);

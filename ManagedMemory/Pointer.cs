@@ -37,5 +37,10 @@ namespace ManagedMemory
         {
             return new ExternalVariable(destination,callback);
         }
+
+        public override string ToString()
+        {
+            return source + " -> " + destination;
+        }
     }
 }

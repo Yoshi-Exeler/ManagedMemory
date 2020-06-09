@@ -49,5 +49,10 @@ namespace ManagedMemory
         {
             address = (long)adr;
         }
+
+        public override string ToString()
+        {
+            return Convert.ToString(address, 16);
+        }
     }
 }
