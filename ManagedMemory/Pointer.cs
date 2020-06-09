@@ -35,7 +35,7 @@ namespace ManagedMemory
 
         public ExternalVariable getDestinationVariable()
         {
-            throw new NotImplementedException();
+            return new ExternalVariable(destination,callback);
         }
     }
 }

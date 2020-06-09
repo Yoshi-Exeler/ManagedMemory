@@ -18,7 +18,17 @@ namespace ManagedMemory
         {
             address = (long)adr;
         }
+        
+        public static Address64 getAddressAtOffset(Address64 adr,int offset)
+        {
+            return new Address64(adr.getAddress() + offset);
+        }
 
+        //returns a new address which is offset by the parameter from the current address
+        public Address64 offsetBy(int offset)
+        {
+            return new Address64(address + offset);
+        }
 
         public long getAddress()
         {
