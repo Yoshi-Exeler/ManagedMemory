@@ -40,7 +40,7 @@ namespace ManagedMemory
             return (IntPtr)address;
         }
 
-        public void setAddress(int adr)
+        public void setAddress(long adr)
         {
             address = adr;
         }
