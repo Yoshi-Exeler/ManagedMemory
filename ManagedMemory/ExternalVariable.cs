@@ -11,7 +11,7 @@ namespace ManagedMemory
         private Address address;
         private ProcessInterface callback;
 
-        public ExternalVariable(Address adr,ProcessInterface pi)
+        public ExternalVariable(Address adr, ProcessInterface pi)
         {
             callback = pi;
             address = adr;
@@ -49,7 +49,7 @@ namespace ManagedMemory
 
         public byte[] GetAsByteArray(int size)
         {
-            return callback.ReadByteArray(address,size);
+            return callback.ReadByteArray(address, size);
         }
 
         public void WriteInt32(int val)

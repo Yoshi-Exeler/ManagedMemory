@@ -15,7 +15,7 @@ namespace ManagedMemory
         private int destinationOffset;
         private ProcessInterface callback;
 
-        public PointerPath(string baseModule,int baseOffset,int[] pathOffsets,int destinationOffset,ProcessInterface callback)
+        public PointerPath(string baseModule, int baseOffset, int[] pathOffsets, int destinationOffset, ProcessInterface callback)
         {
             this.baseModule = baseModule;
             this.pathOffsets = pathOffsets;
@@ -33,12 +33,34 @@ namespace ManagedMemory
             Pointer entryPointer = new Pointer(entryPointerAddress, callback);
             Pointer currentPointer = new Pointer(entryPointer.getDestination(), callback);
 
-            foreach(int i in pathOffsets)
+            foreach (int i in pathOffsets)
             {
                 currentPointer = new Pointer(currentPointer.getSource().offsetBy(i), callback);
                 currentPointer = new Pointer(currentPointer.getDestination(), callback);
             }
-            return new ExternalVariable(currentPointer.getSource().offsetBy(destinationOffset),callback);
+            return new ExternalVariable(currentPointer.getSource().offsetBy(destinationOffset), callback);
+        }
+
+        public string getFormalNotation()
+        {
+            string res = "[" + baseModule + " + 0x" + Convert.ToString(baseOffset, 16) + "] ";
+            foreach (int i in pathOffsets)
+            {
+                if (i != 0)
+                {
+                    res = "[" + res + " + 0x" + Convert.ToString(i, 16) + " ]";
+                }
+                else
+                {
+                    res = "[" + res + "]";
+                }
+            }
+            if (destinationOffset != 0)
+            {
+                return res + " + 0x" + Convert.ToString(destinationOffset, 16);
+            }
+            else return res;
+
         }
 
         public override string ToString()
@@ -49,7 +71,7 @@ namespace ManagedMemory
             string res = "" + baseModuleAddress + " + " + baseOffset + " -> " + entryPointerAddress + "\n";
             foreach (int i in pathOffsets)
             {
-                res += currentPointer.getSource() + "+" + i + " -> "; 
+                res += currentPointer.getSource() + "+" + i + " -> ";
                 currentPointer = new Pointer(currentPointer.getSource().offsetBy(i), callback);
                 res += currentPointer.getDestination() + "\n";
                 currentPointer = new Pointer(currentPointer.getDestination(), callback);

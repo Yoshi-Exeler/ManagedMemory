@@ -18,8 +18,8 @@ namespace ManagedMemory
         {
             address = (long)adr;
         }
-        
-        public static Address getAddressAtOffset(Address adr,int offset)
+
+        public static Address getAddressAtOffset(Address adr, int offset)
         {
             return new Address(adr.getAddress() + offset);
         }
@@ -52,7 +52,7 @@ namespace ManagedMemory
 
         public override string ToString()
         {
-            return "0x"+Convert.ToString(address, 16);
+            return "0x" + Convert.ToString(address, 16);
         }
     }
 }
