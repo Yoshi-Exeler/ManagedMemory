@@ -8,16 +8,16 @@ namespace ManagedMemory
 {
     public class ExternalVariable
     {
-        private Address64 address;
+        private Address address;
         private ProcessInterface callback;
 
-        public ExternalVariable(Address64 adr,ProcessInterface pi)
+        public ExternalVariable(Address adr,ProcessInterface pi)
         {
             callback = pi;
             address = adr;
         }
 
-        public Address64 getAddress()
+        public Address getAddress()
         {
             return address;
         }

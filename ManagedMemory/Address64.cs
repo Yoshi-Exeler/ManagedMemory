@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 
 namespace ManagedMemory
 {
-    public class Address64
+    public class Address
     {
         private long address;
 
-        public Address64(long adr)
+        public Address(long adr)
         {
             address = adr;
         }
-        public Address64(IntPtr adr)
+        public Address(IntPtr adr)
         {
             address = (long)adr;
         }
         
-        public static Address64 getAddressAtOffset(Address64 adr,int offset)
+        public static Address getAddressAtOffset(Address adr,int offset)
         {
-            return new Address64(adr.getAddress() + offset);
+            return new Address(adr.getAddress() + offset);
         }
 
         //returns a new address which is offset by the parameter from the current address
-        public Address64 offsetBy(int offset)
+        public Address offsetBy(int offset)
         {
-            return new Address64(address + offset);
+            return new Address(address + offset);
         }
 
         public long getAddress()

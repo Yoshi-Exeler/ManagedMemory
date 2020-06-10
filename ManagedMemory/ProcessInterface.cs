@@ -27,7 +27,7 @@ namespace ManagedMemory
             return WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);
         }
 
-        private byte[] api_ReadProcessMemory(Address64 adr, int size)
+        private byte[] api_ReadProcessMemory(Address adr, int size)
         {
             uint flNewProtect;
             WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out flNewProtect); //4u 0x40=PAGE_EXECUTE_RW
@@ -38,7 +38,7 @@ namespace ManagedMemory
             return array;
         }
 
-        private void api_WriteProcessMemory(Address64 adr, byte[] val)
+        private void api_WriteProcessMemory(Address adr, byte[] val)
         {
             uint flNewProtect;
             WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out flNewProtect);
@@ -47,11 +47,11 @@ namespace ManagedMemory
             WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, flNewProtect, out flNewProtect);
         }
 
-        public Address64 getModuleBase(string name)
+        public Address getModuleBase(string name)
         {
             foreach (ProcessModule pm in managedProcess.Modules)
             {
-                if (pm.ModuleName == name) return new Address64(pm.BaseAddress);
+                if (pm.ModuleName == name) return new Address(pm.BaseAddress);
             }
             return null;
         }
@@ -76,68 +76,68 @@ namespace ManagedMemory
             return managedProcess.Id;
         }
 
-        public void WriteInt32(Address64 adr, int val)
+        public void WriteInt32(Address adr, int val)
         {
             api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
-        public void WriteInt64(Address64 adr, long val)
+        public void WriteInt64(Address adr, long val)
         {
             api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
-        public void WriteFloat(Address64 adr, float val)
+        public void WriteFloat(Address adr, float val)
         {
             api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
-        public void WriteDouble(Address64 adr, double val)
+        public void WriteDouble(Address adr, double val)
         {
             api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
-        public void WriteByte(Address64 adr, byte val)
+        public void WriteByte(Address adr, byte val)
         {
             byte[] buf = { val };
             api_WriteProcessMemory(adr, buf);
         }
 
-        public void WriteByteArray(Address64 adr, byte[] val)
+        public void WriteByteArray(Address adr, byte[] val)
         {
             api_WriteProcessMemory(adr, val);
         }
 
-        public int ReadInt32(Address64 adr)
+        public int ReadInt32(Address adr)
         {
             byte[] buffer = api_ReadProcessMemory(adr, sizeof(int));
             return BitConverter.ToInt32(buffer, 0);
         }
 
-        public long ReadInt64(Address64 adr)
+        public long ReadInt64(Address adr)
         {
             byte[] buffer = api_ReadProcessMemory(adr, sizeof(long));
             return BitConverter.ToInt64(buffer, 0);
         }
 
-        public float ReadFloat(Address64 adr)
+        public float ReadFloat(Address adr)
         {
             byte[] buffer = api_ReadProcessMemory(adr, sizeof(float));
             return BitConverter.ToSingle(buffer, 0);
         }
 
-        public double ReadDouble(Address64 adr)
+        public double ReadDouble(Address adr)
         {
             byte[] buffer = api_ReadProcessMemory(adr, sizeof(double));
             return BitConverter.ToDouble(buffer, 0);
         }
 
-        public byte ReadByte(Address64 adr)
+        public byte ReadByte(Address adr)
         {
             byte[] buffer = api_ReadProcessMemory(adr, 1);
             return buffer[0];
         }
 
-        public byte[] ReadByteArray(Address64 adr, int size)
+        public byte[] ReadByteArray(Address adr, int size)
         {
             byte[] buffer = api_ReadProcessMemory(adr, size);
             return buffer;

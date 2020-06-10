@@ -9,7 +9,7 @@ namespace ManagedMemory
     public class PointerPath
     {
         private string baseModule;
-        private Address64 baseModuleAddress;
+        private Address baseModuleAddress;
         private int baseOffset;
         private int[] pathOffsets;
         private int destinationOffset;
@@ -29,7 +29,7 @@ namespace ManagedMemory
         //Traverses the PointerPath to find the final address, returns an External Variable initialized at the final address
         public ExternalVariable traverse()
         {
-            Address64 entryPointerAddress = baseModuleAddress.offsetBy(baseOffset);
+            Address entryPointerAddress = baseModuleAddress.offsetBy(baseOffset);
             Pointer entryPointer = new Pointer(entryPointerAddress, callback);
             Pointer currentPointer = new Pointer(entryPointer.getDestination(), callback);
 
@@ -43,7 +43,7 @@ namespace ManagedMemory
 
         public override string ToString()
         {
-            Address64 entryPointerAddress = baseModuleAddress.offsetBy(baseOffset);
+            Address entryPointerAddress = baseModuleAddress.offsetBy(baseOffset);
             Pointer entryPointer = new Pointer(entryPointerAddress, callback);
             Pointer currentPointer = new Pointer(entryPointer.getDestination(), callback);
             string res = "" + baseModuleAddress + " + " + baseOffset + " -> " + entryPointerAddress + "\n";

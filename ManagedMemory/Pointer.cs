@@ -8,30 +8,30 @@ namespace ManagedMemory
 {
     public class Pointer
     {
-        private Address64 source;
-        private Address64 destination;
+        private Address source;
+        private Address destination;
         private ProcessInterface callback;
 
-        public Pointer(Address64 src, ProcessInterface callback)
+        public Pointer(Address src, ProcessInterface callback)
         {
             this.callback = callback;
             source = src;
-            destination = new Address64(callback.ReadInt64(source));
+            destination = new Address(callback.ReadInt64(source));
         }
 
-        public Address64 getSource()
+        public Address getSource()
         {
             return source;
         }
 
-        public Address64 getDestination()
+        public Address getDestination()
         {
             return destination;
         }
 
         public void update()
         {
-            destination = new Address64(callback.ReadInt64(source));
+            destination = new Address(callback.ReadInt64(source));
         }
 
         public ExternalVariable getDestinationVariable()
