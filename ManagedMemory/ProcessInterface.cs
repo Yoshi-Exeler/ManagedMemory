@@ -40,8 +40,7 @@ namespace ManagedMemory
             {
                 for (int x = 0; x < pattern.Length; x++)
                 {
-                    if (i + x > dump.Length) break;
-                    if (!(mask[x] == '?' || dump[i + x] == pattern[x])) break;
+                    if (i + x > dump.Length || !(mask[x] == '?' || dump[i + x] == pattern[x])) break;
                     if (x == pattern.Length) found = true;
                     resIndex = i;
                 }
