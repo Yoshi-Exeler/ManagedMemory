@@ -12,23 +12,6 @@ namespace ManagedMemory
 {
     public class WINAPI
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MEMORY_BASIC_INFORMATION64
-        {
-            public ulong BaseAddress;
-            public ulong AllocationBase;
-            public int AllocationProtect;
-            public int __alignment1;
-            public ulong RegionSize;
-            public int State;
-            public int Protect;
-            public int Type;
-            public int __alignment2;
-        }
-
-        [DllImport("kernel32.dll")]
-        public static extern int VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, out MEMORY_BASIC_INFORMATION64 lpBuffer, uint dwLength);
-
         [Flags]
         public enum ProcessAccessFlags : uint
         {
@@ -47,17 +30,8 @@ namespace ManagedMemory
             Synchronize = 1048576u
         }
 
-        [DllImport("NTDLL.DLL", SetLastError = true)]
-        public static extern int NtQueryInformationProcess(IntPtr hProcess, int pic, IntPtr pbi, uint cb, out uint pSize);
-
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
-
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, ref long lpNumberOfBytesRead);
@@ -71,15 +45,6 @@ namespace ManagedMemory
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, out UIntPtr lpNumberOfBytesWritten);
 
-        [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr GetModuleHandle(string lpModuleName);
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
-
         [DllImport("kernel32.dll")]
         public static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint flNewProtect, out uint lpflOldProtect);
 
@@ -92,32 +57,5 @@ namespace ManagedMemory
 
         [DllImport("kernel32.dll")]
         public static extern int ResumeThread(IntPtr hThread);
-
-        [Flags]
-        public enum MemoryProtection
-        {
-            Execute = 16,
-            ExecuteRead = 32,
-            ExecuteReadWrite = 64,
-            ExecuteWriteCopy = 128,
-            NoAccess = 1,
-            ReadOnly = 2,
-            ReadWrite = 4,
-            WriteCopy = 8,
-            GuardModifierflag = 256,
-            NoCacheModifierflag = 512,
-            WriteCombineModifierflag = 1024
-        }
-
-        [Flags]
-        public enum FreeType
-        {
-            Decommit = 16384,
-            Release = 32768
-        }
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool VirtualFree(IntPtr lpAddress, int dwSize, FreeType dwFreeType);
-
     }
 }
