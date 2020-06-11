@@ -27,9 +27,9 @@ namespace ManagedMemory
             if (baseModuleAddress == null) throw new InvalidOperationException("the specified base module does not exist");
         }
 
-        /*Creates a PointerPath from the formal notation. General Notation Template:
-         * [[[BaseModuleName.Extension + 0xBaseOffset] + 0xLayerOneOffser] + 0xLayerTwoOffset ] + 0xFinalValueOffset
-         * Where each layer that is encapsulated by [] represents one pointer jump
+        /*Creates a PointerPath from the formal notation. General notation template:
+         * [[[BaseModuleName.Extension + 0xBaseOffset] + 0xLayerOneOffset] + 0xLayerTwoOffset ] + 0xFinalValueOffset
+         * Where each layer that is encapsulated by [] represents one pointer jump.
          */
         public static PointerPath createFromFormalNotation(string expression, ProcessInterface callback)
         {
