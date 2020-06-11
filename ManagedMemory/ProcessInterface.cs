@@ -22,8 +22,7 @@ namespace ManagedMemory
             handle = api_OpenProcess(managedProcess.Id);
         }
 
-        //Searches the process for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset
-        // or null if the pattern was not found. This method is resource intensive as it creates a full memory dump of the target process.
+        //Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
         public Address findPattern(string module, byte[] pattern, string mask, int finalOffset)
         {
             ProcessModule mod = null;
