@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace ManagedMemory
 {
@@ -24,6 +25,64 @@ namespace ManagedMemory
             this.baseOffset = baseOffset;
             baseModuleAddress = callback.getModuleBase(baseModule);
             if (baseModuleAddress == null) throw new InvalidOperationException("the specified base module does not exist");
+        }
+
+        public static PointerPath createFromFormalNotation(string expression,ProcessInterface callback)
+        {
+            expression = removeAll(expression, ' ');
+            string moduleName = removeAllRange(expression, new char[] { '[', ']'});
+            moduleName = moduleName.Substring(0, moduleName.IndexOf('+'));
+            int baseOffset = hexToInt(expression.Substring(expression.IndexOf('+') + 1, expression.IndexOf(']') - expression.IndexOf('+') - 1));
+            string offsets = expression.Remove(expression.IndexOf(moduleName[0])-1, expression.IndexOf(']')- expression.IndexOf(moduleName[0]) + 2);
+            offsets = removeAll(offsets, ' ');
+            ArrayList offsetCollection = new ArrayList();
+            while(offsets.Contains(']'))
+            {
+                if(offsets[offsets.IndexOf(']')-1] == '[' && offsets.IndexOf('+') > offsets.IndexOf(']'))
+                {
+                    offsetCollection.Add(0x0);
+                    offsets = offsets.Remove(offsets.IndexOf(']') - 1, 2);
+                } else
+                {
+                    string curOffset = offsets.Substring(offsets.IndexOf('+') + 1, offsets.IndexOf(']') - offsets.IndexOf('+')-1);
+                    offsetCollection.Add(hexToInt(curOffset));
+                    offsets = offsets.Remove(offsets.IndexOf(']') - curOffset.Length - 2,curOffset.Length+3);
+                }
+                
+            }
+            int finalOffset = hexToInt(offsets.Remove(offsets.IndexOf('+'), 1));
+            int[] finOffsets = new int[offsetCollection.Count];
+            for(int i = 0; i < offsetCollection.Count; i++)
+            {
+                finOffsets[i] =(int) offsetCollection[i];
+            }
+            return new PointerPath(moduleName, baseOffset, finOffsets, finalOffset, callback);
+        }
+
+        private static int hexToInt(string hex)
+        {
+            hex = hex.Substring(2);
+            return Int32.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        private static string removeAllRange(string input, char[] targets)
+        {
+            string res = input;
+            foreach (char c in targets)
+            {
+                res = removeAll(res, c);
+            }
+            return res;
+        }
+
+        private static string removeAll(string input, char target)
+        {
+            string res = input;
+            while (res.Contains(target))
+            {
+                res = res.Remove(res.IndexOf(target), 1);
+            }
+            return res;
         }
 
         //Traverses the PointerPath to find the final address, returns an External Variable initialized at the final address
