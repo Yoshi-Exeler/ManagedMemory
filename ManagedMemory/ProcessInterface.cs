@@ -59,22 +59,22 @@ namespace ManagedMemory
 
         private byte[] api_ReadProcessMemory(Address adr, int size)
         {
-            uint flNewProtect;
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out flNewProtect); //4u 0x40=PAGE_EXECUTE_RW
+            uint oldProtection;
+            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection); //4u 0x40=PAGE_EXECUTE_RW
             byte[] array = new byte[size];
             long numRead = 0;
             WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead);
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, flNewProtect, out flNewProtect);
+            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection);
             return array;
         }
 
         private void api_WriteProcessMemory(Address adr, byte[] val)
         {
-            uint flNewProtect;
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out flNewProtect);
+            uint oldProtection;
+            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection);
             long numWritten = 0;
             bool flag = WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten);
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, flNewProtect, out flNewProtect);
+            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection);
         }
 
         public Address getModuleBase(string name)
