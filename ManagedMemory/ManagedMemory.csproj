@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Address64.cs" />
+    <Compile Include="Address.cs" />
     <Compile Include="ExternalVariable.cs" />
     <Compile Include="Pointer.cs" />
     <Compile Include="PointerPath.cs" />
