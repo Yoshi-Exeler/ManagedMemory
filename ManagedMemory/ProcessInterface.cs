@@ -33,8 +33,7 @@ namespace ManagedMemory
             }
             if (mod == null) throw new Exception("specified module not found");
             byte[] dump = new byte[mod.ModuleMemorySize];
-            long numRead = 0;
-            WINAPI.ReadProcessMemory(handle, mod.BaseAddress, dump, dump.Length, ref numRead);
+            api_ReadProcessMemory(new Address(mod.BaseAddress), dump.Length);
             bool found = false;
             long resIndex = -1;
             for (int i = 0; i < dump.Length; i++)
