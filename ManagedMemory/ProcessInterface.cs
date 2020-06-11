@@ -32,7 +32,7 @@ namespace ManagedMemory
             {
                 if (pm.ModuleName == module) mod = pm;
             }
-            if (mod == null) throw new ArgumentException("The Specified module "+module+" was not found");
+            if (mod == null) throw new ArgumentException("The Specified module " + module + " was not found");
             byte[] dump = new byte[mod.ModuleMemorySize];
             api_ReadProcessMemory(new Address(mod.BaseAddress), dump.Length);
             bool found = false;
@@ -47,7 +47,7 @@ namespace ManagedMemory
                         found = true;
                         resIndex = i;
                     }
-                    
+
                 }
                 if (found) break;
             }
