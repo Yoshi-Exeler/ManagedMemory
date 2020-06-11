@@ -22,7 +22,9 @@ namespace ManagedMemory
             handle = api_OpenProcess(managedProcess.Id);
         }
 
-        //Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
+        /*Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
+         * In most cases you should simply pass the name of the main modulue for the "module" argument.
+         */
         public Address findPattern(string module, byte[] pattern, string mask, int finalOffset)
         {
             ProcessModule mod = null;
