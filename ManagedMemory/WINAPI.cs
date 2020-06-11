@@ -12,6 +12,23 @@ namespace ManagedMemory
 {
     public class WINAPI
     {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MEMORY_BASIC_INFORMATION64
+        {
+            public ulong BaseAddress;
+            public ulong AllocationBase;
+            public int AllocationProtect;
+            public int __alignment1;
+            public ulong RegionSize;
+            public int State;
+            public int Protect;
+            public int Type;
+            public int __alignment2;
+        }
+
+        [DllImport("kernel32.dll")]
+        public static extern int VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, out MEMORY_BASIC_INFORMATION64 lpBuffer, uint dwLength);
+
         [Flags]
         public enum ProcessAccessFlags : uint
         {
@@ -46,6 +63,9 @@ namespace ManagedMemory
         public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, ref long lpNumberOfBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, long dwSize, ref long lpNumberOfBytesRead);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int nSize, ref long lpNumberOfBytesWritten);
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -54,7 +74,7 @@ namespace ManagedMemory
         [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
         public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
 
         [DllImport("kernel32.dll")]

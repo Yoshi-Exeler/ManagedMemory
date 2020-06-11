@@ -22,6 +22,36 @@ namespace ManagedMemory
             handle = api_OpenProcess(managedProcess.Id);
         }
 
+        //Searches the process for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset
+        // or null if the pattern was not found. This method is resource intensive as it creates a full memory dump of the target process.
+        public Address findPattern(string module, byte[] pattern, string mask, int finalOffset)
+        {
+            ProcessModule mod = null;
+            foreach (ProcessModule pm in managedProcess.Modules)
+            {
+                if (pm.ModuleName == module) mod = pm;
+            }
+            if (mod == null) throw new Exception("specified module not found");
+            byte[] dump = new byte[mod.ModuleMemorySize];
+            long numRead = 0;
+            WINAPI.ReadProcessMemory(handle, mod.BaseAddress, dump, dump.Length, ref numRead);
+            bool found = false;
+            long resIndex = -1;
+            for (int i = 0; i < dump.Length; i++)
+            {
+                for (int x = 0; x < pattern.Length; x++)
+                {
+                    if (i + x > dump.Length) break;
+                    if (!(mask[x] == '?' || dump[i + x] == pattern[x])) break;
+                    if (x == pattern.Length) found = true;
+                    resIndex = i;
+                }
+                if (found) break;
+            }
+            if (!found) return null;
+            return new Address((long)mod.BaseAddress + resIndex + finalOffset);
+        }
+
         private IntPtr api_OpenProcess(int pid)
         {
             return WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);
