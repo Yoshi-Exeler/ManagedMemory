@@ -32,7 +32,7 @@ namespace ManagedMemory
          * Where each layer that is encapsulated by [] represents one pointer jump.
          * In case of a double jump do not use +0x0 instead immediately close the current bracket 
          * For Example this expression contains a double jump: [[[[explorer.exe + 0x2570] + 0xC]] + 0xA] 0x10
-         * Jumps may be stacked like this indefinitely
+         * Jumps may be stacked like this indefinitely.
          */
         public static PointerPath createFromFormalNotation(string expression, ProcessInterface callback)
         {

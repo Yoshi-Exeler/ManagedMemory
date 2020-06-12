@@ -68,21 +68,21 @@ namespace ManagedMemory
         private byte[] api_ReadProcessMemory(Address adr, int size)
         {
             uint oldProtection;
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection); //4u 0x40=PAGE_EXECUTE_RW
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection) == false) throw new AccessViolationException();
             byte[] array = new byte[size];
             long numRead = 0;
-            WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead);
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection);
+            if (WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead) == false) throw new AccessViolationException();
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection) == false) throw new AccessViolationException();
             return array;
         }
 
         private void api_WriteProcessMemory(Address adr, byte[] val)
         {
             uint oldProtection;
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection);
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection) == false) throw new AccessViolationException();
             long numWritten = 0;
-            bool flag = WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten);
-            WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection);
+            if (WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten) == false) throw new AccessViolationException();
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection) == false) throw new AccessViolationException();
         }
 
         public Address getModuleBase(string name)
