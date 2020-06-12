@@ -60,6 +60,18 @@ namespace ManagedMemory
             return handle;
         }
 
+        public void injectDll(string libraryPath)
+        {
+            IntPtr pathPointer = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            if (pathPointer == null) throw new AccessViolationException();
+            long bytesWritten = 0;
+            if (WINAPI.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath), Encoding.ASCII.GetBytes(libraryPath).Length, ref bytesWritten) == false) throw new AccessViolationException();
+            IntPtr kernelDllPointer = WINAPI.GetModuleHandle("Kernel32.dll");
+            IntPtr loadLibraryPointer = WINAPI.GetProcAddress(kernelDllPointer, "LoadLibraryA");
+            IntPtr threadHandle = WINAPI.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
+            if(WINAPI.CloseHandle(threadHandle) == false) throw new AccessViolationException();
+        }
+
         private IntPtr api_OpenProcess(int pid)
         {
             return WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);
