@@ -56,7 +56,7 @@ namespace ManagedMemory
         public static extern bool WriteProcessMemory(IntPtr processHandle, IntPtr targetAddress, byte[] input, int inputSize, ref long numberOfBytesWritten);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool VirtualProtectEx(IntPtr processHandle, IntPtr targetAddress, int regionSize, uint newProtection, out uint oldProtection);
+        public static extern bool VirtualProtectEx(IntPtr processHandle, IntPtr regionStart, int regionSize, uint newProtection, out uint oldProtection);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr OpenThread(ProcessAccessFlags desiredAccess, bool inheritHandle, uint threadID);
