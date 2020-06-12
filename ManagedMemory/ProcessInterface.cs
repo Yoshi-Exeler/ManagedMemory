@@ -55,6 +55,11 @@ namespace ManagedMemory
             return new Address((long)mod.BaseAddress + resIndex + finalOffset);
         }
 
+        public IntPtr getHandle()
+        {
+            return handle;
+        }
+
         private IntPtr api_OpenProcess(int pid)
         {
             return WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);

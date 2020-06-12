@@ -12,6 +12,22 @@ namespace ManagedMemory
 {
     public class WINAPI
     {
+        public enum MemoryProtection : uint
+        {
+            PAGE_NO_ACCESS = 0x1,
+            PAGE_READ_ONLY = 0x2,
+            PAGE_READ_WRITE = 0x4,
+            PAGE_WRITE_COPY = 0x8,
+            PAGE_EXECUTE = 0x10,
+            PAGE_EXECUTE_READ = 0x20,
+            PAGE_EXECUTE_READ_WRITE = 0x40,
+            PAGE_EXECUTE_WRITE_COPY = 0x80,
+            PAGE_GUARD = 0x100,
+            PAGE_NO_CACHE = 0x200,
+            PAGE_WRITE_COMBINE = 0x400
+        };
+
+
         [Flags]
         public enum ProcessAccessFlags : uint
         {
