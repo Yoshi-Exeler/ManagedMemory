@@ -47,28 +47,24 @@ namespace ManagedMemory
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, int processId);
+        public static extern IntPtr OpenProcess(ProcessAccessFlags accessFlags, bool inheritHandle, int processId);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, ref long lpNumberOfBytesRead);
+        public static extern bool ReadProcessMemory(IntPtr processHandle, IntPtr targetAddress, [Out] byte[] output, int outputSize, ref long numberOfBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int nSize, ref long lpNumberOfBytesWritten);
+        public static extern bool WriteProcessMemory(IntPtr processHandle, IntPtr targetAddress, byte[] input, int inputSize, ref long numberOfBytesWritten);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, out UIntPtr lpNumberOfBytesWritten);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, uint flNewProtect, out uint lpflOldProtect);
+        public static extern bool VirtualProtectEx(IntPtr processHandle, IntPtr targetAddress, int regionSize, uint newProtection, out uint oldProtection);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenThread(ProcessAccessFlags dwDesiredAccess, bool bInheritHandle,
-        uint dwThreadId);
+        public static extern IntPtr OpenThread(ProcessAccessFlags desiredAccess, bool inheritHandle, uint threadID);
 
-        [DllImport("kernel32.dll")]
-        public static extern uint SuspendThread(IntPtr hThread);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern uint SuspendThread(IntPtr threadHandle);
 
-        [DllImport("kernel32.dll")]
-        public static extern int ResumeThread(IntPtr hThread);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern int ResumeThread(IntPtr threadHandle);
     }
 }
