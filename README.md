@@ -7,7 +7,8 @@ This library is made to interact only with 64Bit processes. <br>
 
 # Features
 ° Read and write process memory <br>
-° Neat classes to model Addresses, Pointers, PointerPaths and variables in the target process (ExternalVariable) <br>
+° Change memory protection <br>
 ° Signature scanning <br>
+° Neat classes to model Addresses, Pointers, PointerPaths and External Variables <br>
 ° Create PointerPaths from Formal Notation and convert existing ones to formal notation for easy saving and constructing <br>
 Example: [[[somemodule.extension + 0xbaseOffset] + 0xLayerOneOffset] + 0xLayerTwoOffset] + 0x FinalOffset <br>
