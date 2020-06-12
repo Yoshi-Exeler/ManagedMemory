@@ -9,7 +9,7 @@ This library is made to interact only with 64Bit processes. <br>
 ° Read and write process memory <br>
 ° Change memory protection <br>
 ° Patternscanning with Masking <br>
-° x64 Native Dll Injection <br>
+° Native Dll Injection <br>
 ° Neat classes to model Addresses, Pointers, PointerPaths and External Variables <br>
 ° Create PointerPaths from Formal Notation and convert existing ones to formal notation for easy saving and constructing <br>
 Example: [[[somemodule.extension + 0xbaseOffset] + 0xLayerOneOffset] + 0xLayerTwoOffset] + 0x FinalOffset <br>
