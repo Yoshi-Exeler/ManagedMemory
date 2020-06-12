@@ -69,7 +69,7 @@ namespace ManagedMemory
             IntPtr kernelDllPointer = WINAPI.GetModuleHandle("Kernel32.dll");
             IntPtr loadLibraryPointer = WINAPI.GetProcAddress(kernelDllPointer, "LoadLibraryA");
             IntPtr threadHandle = WINAPI.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
-            if(WINAPI.CloseHandle(threadHandle) == false) throw new AccessViolationException();
+            if (WINAPI.CloseHandle(threadHandle) == false) throw new AccessViolationException();
         }
 
         private IntPtr api_OpenProcess(int pid)
