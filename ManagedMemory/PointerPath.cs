@@ -31,7 +31,8 @@ namespace ManagedMemory
          * [[[BaseModuleName.Extension + 0xBaseOffset] + 0xLayerOneOffset] + 0xLayerTwoOffset ] + 0xFinalValueOffset
          * Where each layer that is encapsulated by [] represents one pointer jump.
          * In case of a double jump do not use +0x0 instead immediately close the current bracket 
-         * For Example this expression contains a double jump: [[[[BaseModuleName.Extension + 0x2570] + 0xC]] + 0xA] 0x10
+         * For Example this expression contains a double jump: [[[[explorer.exe + 0x2570] + 0xC]] + 0xA] 0x10
+         * Jumps may be stacked like this indefinitely
          */
         public static PointerPath createFromFormalNotation(string expression, ProcessInterface callback)
         {
