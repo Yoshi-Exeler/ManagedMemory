@@ -58,5 +58,10 @@ namespace ManagedMemory
             APIProxy.CloseHandle(this);
         }
 
+        public override string ToString()
+        {
+            return "0x"+Convert.ToString(handle, 16);
+        }
+
     }
 }
