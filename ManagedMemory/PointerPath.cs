@@ -29,10 +29,8 @@ namespace ManagedMemory
 
         /*Creates a PointerPath from the formal notation. General notation template:
          * [[[BaseModuleName.Extension + 0xBaseOffset] + 0xLayerOneOffset] + 0xLayerTwoOffset ] + 0xFinalValueOffset
-         * Where each layer that is encapsulated by [] represents one pointer jump.
-         * In case of a double jump do not use +0x0 instead immediately close the current bracket 
-         * For Example this expression contains a double jump: [[[[explorer.exe + 0x2570] + 0xC]] + 0xA] 0x10
-         * Jumps may be stacked like this indefinitely.
+         * Each encapsulation by [] represents dereferencing the inner pointer
+         * If you wish to dereference multiple times without adding offsets simply encapsulate multiple times.
          */
         public static PointerPath createFromFormalNotation(string expression, ProcessInterface callback)
         {
