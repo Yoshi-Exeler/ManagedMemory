@@ -9,6 +9,11 @@ namespace ManagedMemory
 {
     public static class APIProxy
     {
+        public static void VirtualFreeEx(Handle processHandle, Address targetAddress, int size, APIProxy.FreeType freeType)
+        {
+            if (WINAPI.VirtualFreeEx(processHandle.GetHandleAsPointer(), targetAddress.GetAsPointer(), size, freeType) == false) throw new VirtualFreeException("Freeing " + size + " Byes at " + targetAddress + " failed with errorcode " + Marshal.GetLastWin32Error());
+        }
+
         public static Handle GetModuleHandle(string moduleName)
         {
             IntPtr res = WINAPI.GetModuleHandle(moduleName);
@@ -97,7 +102,12 @@ namespace ManagedMemory
             return res;
         }
 
-
+        [Flags]
+        public enum FreeType
+        {
+            Decommit = 0x4000,
+            Release = 0x8000,
+        }
 
         [Flags]
         public enum ThreadAccessFlags : uint

@@ -12,6 +12,9 @@ namespace ManagedMemory
 {
     internal class WINAPI
     {
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, APIProxy.FreeType dwFreeType);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern uint GetProcessIdOfThread(IntPtr handle);
 

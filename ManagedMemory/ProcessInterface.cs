@@ -81,6 +81,11 @@ namespace ManagedMemory
             return allocation;
         }
 
+        public void FreeMemoryRegion(MemoryRegion region)
+        {
+            APIProxy.VirtualFreeEx(handle, region.start, region.lenght, APIProxy.FreeType.Release);
+        }
+
         protected byte[] API_ReadProcessMemory(Address adr, int size)
         {
             uint oldProtection = APIProxy.VirtualProtectEx(handle, adr, size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);

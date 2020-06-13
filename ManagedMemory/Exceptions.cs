@@ -27,4 +27,6 @@ namespace ManagedMemory
     public class GetProcedureAddressException : Exception { public GetProcedureAddressException(string ex) : base(ex) { } }
 
     public class GetProcessIDFromThreadException : Exception { public GetProcessIDFromThreadException(string ex) : base(ex) { } }
+
+    public class VirtualFreeException : Exception { public VirtualFreeException(string ex) : base(ex) { } }
 }
