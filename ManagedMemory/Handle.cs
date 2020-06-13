@@ -10,35 +10,32 @@ namespace ManagedMemory
     public class Handle
     {
         protected long handle;
-        protected ProcessInterface callback;
 
-        public Handle(long handle, ProcessInterface callback)
+        public Handle(long handle)
         {
             this.handle = handle;
-            this.callback = callback;
         }
 
-        public Handle(IntPtr handle, ProcessInterface callback)
+        public Handle(IntPtr handle)
         {
             this.handle = (long)handle;
-            this.callback = callback;
         }
 
-        public static Handle GetProcessHandle(string name, APIProxy.ProcessAccessFlags access, ProcessInterface callback)
+        public static Handle GetProcessHandle(string name, APIProxy.ProcessAccessFlags access)
         {
             Process[] procs = Process.GetProcessesByName(name);
             if (procs.Length != 1) throw new Exception("process is not unique or does not exist");
-            return new Handle(APIProxy.OpenProcess(access, procs[0].Id), callback);
+            return APIProxy.OpenProcess(access, procs[0].Id);
         }
 
-        public static Handle GetThreadHandle(uint threadID, APIProxy.ThreadAccessFlags access, ProcessInterface callback)
+        public static Handle GetThreadHandle(uint threadID, APIProxy.ThreadAccessFlags access)
         {
-            return new Handle(APIProxy.OpenThread(access, threadID), callback);
+            return APIProxy.OpenThread(access, threadID);
         }
 
-        public static Handle GetModuleHandle(string moduleName, ProcessInterface callback)
+        public static Handle GetModuleHandle(string moduleName)
         {
-            return new Handle(APIProxy.GetModuleHandle(moduleName), callback);
+            return APIProxy.GetModuleHandle(moduleName);
 
         }
 
@@ -54,7 +51,7 @@ namespace ManagedMemory
 
         public void Close()
         {
-            APIProxy.CloseHandle((IntPtr)handle);
+            APIProxy.CloseHandle(this);
         }
 
     }

@@ -12,14 +12,14 @@ namespace ManagedMemory
     public class ProcessInterface
     {
         protected Process managedProcess;
-        protected IntPtr handle;
+        protected Handle handle;
 
         public ProcessInterface(string name)
         {
             Process[] procs = Process.GetProcessesByName(name);
             if (procs.Length != 1) throw new Exception("Process is not unique or does not exist");
             managedProcess = procs[0];
-            handle = API_OpenProcess(managedProcess.Id);
+            handle = APIProxy.OpenProcess(APIProxy.ProcessAccessFlags.All, managedProcess.Id);
         }
 
         /*Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
@@ -55,46 +55,31 @@ namespace ManagedMemory
             return new Address((long)mod.BaseAddress + resIndex + finalOffset);
         }
 
-        public IntPtr GetHandle()
+        public Handle GetHandle()
         {
             return handle;
         }
 
         public void InjectDll(string libraryPath)
         {
-            IntPtr pathPointer = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            APIProxy.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath));
-            IntPtr kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
+            MemoryRegion pathRegion = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, pathRegion.start.GetAsPointer(), Encoding.ASCII.GetBytes(libraryPath));
+            Handle kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
             IntPtr loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
-            IntPtr threadHandle = APIProxy.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
-            APIProxy.CloseHandle(threadHandle);
+            Handle threadHandle = APIProxy.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathRegion.start.GetAsPointer(), 0, IntPtr.Zero);
+            threadHandle.Close();
         }
 
         public MemoryRegion AllocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            IntPtr allocation = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
-            if (allocation == null) throw new Exception("Allocation at an undefinded location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
-            MemoryRegion res = new MemoryRegion();
-            res.start = new Address(allocation);
-            res.lenght = size;
-            return res;
+            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
+            return allocation;
         }
 
         public MemoryRegion AllocateMemoryAt(Address adr, int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            IntPtr allocation = APIProxy.VirtualAllocEx(handle, adr.GetAsPointer(), (IntPtr)size, allocationType, memoryProtection);
-            if (allocation == null) throw new Exception("Allocation at " + adr + " location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
-            MemoryRegion res = new MemoryRegion();
-            res.start = new Address(allocation);
-            res.lenght = size;
-            return res;
-        }
-
-        protected IntPtr API_OpenProcess(int pid)
-        {
-            IntPtr processHandle = APIProxy.OpenProcess(APIProxy.ProcessAccessFlags.All, pid);
-            if (processHandle == null) throw new OpenProcessException("Obtaining a handle with Allaccess to the process with the pid " + pid + " has failed with errorcode " + Marshal.GetLastWin32Error());
-            return processHandle;
+            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, adr.GetAsPointer(), (IntPtr)size, allocationType, memoryProtection);
+            return allocation;
         }
 
         protected byte[] API_ReadProcessMemory(Address adr, int size)
@@ -212,7 +197,7 @@ namespace ManagedMemory
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
-                IntPtr cHandle = IntPtr.Zero;
+                Handle cHandle = new Handle(IntPtr.Zero);
                 cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
                 APIProxy.SuspendThread(cHandle);
             }
@@ -222,7 +207,7 @@ namespace ManagedMemory
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
-                IntPtr cHandle = IntPtr.Zero;
+                Handle cHandle = new Handle(IntPtr.Zero);
                 cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
                 APIProxy.ResumeThread(cHandle);
             }
