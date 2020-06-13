@@ -22,10 +22,9 @@ namespace ManagedMemory
             return address;
         }
 
-        public void changeProtection(WINAPI.MemoryProtection newProtection, int sizeOfVariable)
+        public uint changeProtection(APIProxy.MemoryProtection newProtection, int sizeOfVariable)
         {
-            uint oldProtection = 0;
-            WINAPI.VirtualProtectEx(callback.getHandle(), getAddress().getAsPointer(), sizeOfVariable, (uint)newProtection, out oldProtection);
+            return APIProxy.VirtualProtectEx(callback.getHandle(), getAddress().getAsPointer(), sizeOfVariable, (uint)newProtection);
         }
 
         public int GetAsInt32()

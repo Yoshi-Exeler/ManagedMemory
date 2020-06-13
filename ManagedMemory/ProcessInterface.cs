@@ -41,7 +41,7 @@ namespace ManagedMemory
             {
                 for (int x = 0; x < pattern.Length; x++)
                 {
-                    if (i + x > dump.Length || !(mask[x] == '?' || dump[i + x] == pattern[x])) break;
+                    if (i + x >= dump.Length || !(mask[x] == '?' || dump[i + x] == pattern[x])) break;
                     if (x == pattern.Length)
                     {
                         found = true;
@@ -62,20 +62,18 @@ namespace ManagedMemory
 
         public void injectDll(string libraryPath)
         {
-            IntPtr pathPointer = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            if (pathPointer == null) throw new VirtualAllocationException("Allocation at an undefinded location for " + libraryPath.Length + " Bytes  with  allocationType " + (WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit) + " and memoryProtection " + WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE + " has failed with the errorcode " + Marshal.GetLastWin32Error());
-            long bytesWritten = 0;
-            if (WINAPI.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath), Encoding.ASCII.GetBytes(libraryPath).Length, ref bytesWritten) == false) throw new WriteProcessMemoryException("Writing "+libraryPath.Length+" Bytes to "+new Address(pathPointer)+" has failed with the errorcode "+Marshal.GetLastWin32Error());
-            IntPtr kernelDllPointer = WINAPI.GetModuleHandle("Kernel32.dll");
-            IntPtr loadLibraryPointer = WINAPI.GetProcAddress(kernelDllPointer, "LoadLibraryA");
-            IntPtr threadHandle = WINAPI.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
-            if (WINAPI.CloseHandle(threadHandle) == false) throw new CloseHandleException("Closing the handle " + threadHandle + " has failed with the errorcode " + Marshal.GetLastWin32Error());
+            IntPtr pathPointer = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath));
+            IntPtr kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
+            IntPtr loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
+            IntPtr threadHandle = APIProxy.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
+            APIProxy.CloseHandle(threadHandle);
         }
 
 
-        public MemoryRegion allocateMemory(int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion allocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            IntPtr allocation = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
+            IntPtr allocation = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
             if (allocation == null) throw new Exception("Allocation at an undefinded location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion res = new MemoryRegion();
             res.start = new Address(allocation);
@@ -83,9 +81,9 @@ namespace ManagedMemory
             return res;
         }
 
-        public MemoryRegion allocateMemoryAt(Address adr, int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion allocateMemoryAt(Address adr, int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            IntPtr allocation = WINAPI.VirtualAllocEx(handle, adr.getAsPointer(), (IntPtr)size, allocationType, memoryProtection);
+            IntPtr allocation = APIProxy.VirtualAllocEx(handle, adr.getAsPointer(), (IntPtr)size, allocationType, memoryProtection);
             if (allocation == null) throw new Exception("Allocation at " + adr + " location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion res = new MemoryRegion();
             res.start = new Address(allocation);
@@ -95,29 +93,24 @@ namespace ManagedMemory
 
         private IntPtr api_OpenProcess(int pid)
         {
-            IntPtr processHandle = WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);
+            IntPtr processHandle = APIProxy.OpenProcess(APIProxy.ProcessAccessFlags.All, pid);
             if (processHandle == null) throw new OpenProcessException("Obtaining a handle with Allaccess to the process with the pid " + pid + " has failed with errorcode " + Marshal.GetLastWin32Error());
             return processHandle;
         }
 
         private byte[] api_ReadProcessMemory(Address adr, int size)
         {
-            uint oldProtection;
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection) == false) throw new VirtualProtectionException("Changing the protection of "+adr+" to 0x40 has failed with the errorcode "+Marshal.GetLastWin32Error());
-            byte[] array = new byte[size];
-            long numRead = 0;
-            if (WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead) == false) throw new ReadProcessMemoryException("Reading "+size+" Bytes from "+adr+" has failed with the errorcode"+Marshal.GetLastWin32Error());
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection) == false) throw new VirtualProtectionException("Reverting the protection of "+adr+" back to its previous protection has failed with the errorcode"+Marshal.GetLastWin32Error());
-            return array;
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            byte[] buffer = APIProxy.ReadProcessMemory(handle, adr.getAsPointer(), size);
+            APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection);
+            return buffer;
         }
 
         private void api_WriteProcessMemory(Address adr, byte[] val)
         {
-            uint oldProtection;
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection) == false) throw new VirtualProtectionException("Changing the protection of " + adr + " to 0x40 has failed with the errorcode " + Marshal.GetLastWin32Error());
-            long numWritten = 0;
-            if (WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten) == false) throw new WriteProcessMemoryException("Writing "+val.Length+" Bytes to "+adr+" has failed with the errorcode"+Marshal.GetLastWin32Error());
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection) == false) throw new VirtualProtectionException("Reverting the protection of " + adr + " back to its previous protection has failed with the errorcode" + Marshal.GetLastWin32Error());
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, adr.getAsPointer(), val);
+            APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection);
         }
 
         public Address getModuleBase(string name)
@@ -221,9 +214,8 @@ namespace ManagedMemory
             foreach (ProcessThread pt in managedProcess.Threads)
             {
                 IntPtr cHandle = IntPtr.Zero;
-                cHandle = WINAPI.OpenThread(WINAPI.ThreadAccessFlags.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with 0x2 access to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
-                WINAPI.SuspendThread(cHandle);
+                cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
+                APIProxy.SuspendThread(cHandle);
             }
         }
 
@@ -232,9 +224,8 @@ namespace ManagedMemory
             foreach (ProcessThread pt in managedProcess.Threads)
             {
                 IntPtr cHandle = IntPtr.Zero;
-                cHandle = WINAPI.OpenThread(WINAPI.ThreadAccessFlags.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with 0x2 access to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
-                WINAPI.ResumeThread(cHandle);
+                cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
+                APIProxy.ResumeThread(cHandle);
             }
         }
 

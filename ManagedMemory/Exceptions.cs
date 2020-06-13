@@ -21,4 +21,8 @@ namespace ManagedMemory
     public class OpenProcessException : Exception { public OpenProcessException(string ex) : base(ex) { } }
 
     public class OpenThreadException : Exception { public OpenThreadException(string ex) : base(ex) { } }
+
+    public class GetModuleHandleException : Exception { public GetModuleHandleException(string ex) : base(ex) { } }
+
+    public class GetProcedureAddressException : Exception { public GetProcedureAddressException(string ex) : base(ex) { } }
 }
