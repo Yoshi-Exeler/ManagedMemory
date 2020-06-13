@@ -36,9 +36,10 @@ namespace ManagedMemory
             return new Handle(APIProxy.OpenThread(access, threadID), callback);
         }
 
-        public static Handle GetModuleHandle(Handle processHandle, string moduleName, ProcessInterface callback)
+        public static Handle GetModuleHandle(string moduleName, ProcessInterface callback)
         {
-            throw new NotImplementedException();
+            return new Handle(APIProxy.GetModuleHandle(moduleName), callback);
+
         }
 
         public long GetHandleAsLong()
