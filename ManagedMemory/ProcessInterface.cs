@@ -222,6 +222,7 @@ namespace ManagedMemory
             {
                 IntPtr cHandle = IntPtr.Zero;
                 cHandle = WINAPI.OpenThread(WINAPI.ProcessAccessFlags.All, false, (uint)pt.Id);
+                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with Allaccess to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
                 WINAPI.SuspendThread(cHandle);
             }
         }
@@ -232,6 +233,7 @@ namespace ManagedMemory
             {
                 IntPtr cHandle = IntPtr.Zero;
                 cHandle = WINAPI.OpenThread(WINAPI.ProcessAccessFlags.All, false, (uint)pt.Id);
+                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with Allaccess to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
                 WINAPI.ResumeThread(cHandle);
             }
         }

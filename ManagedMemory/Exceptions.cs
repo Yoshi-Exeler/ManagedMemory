@@ -19,4 +19,6 @@ namespace ManagedMemory
     public class CreateRemoteThreadException : Exception { public CreateRemoteThreadException(string ex) : base(ex) { } }
 
     public class OpenProcessException : Exception { public OpenProcessException(string ex) : base(ex) { } }
+
+    public class OpenThreadException : Exception { public OpenThreadException(string ex) : base(ex) { } }
 }
