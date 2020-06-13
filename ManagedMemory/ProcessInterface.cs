@@ -16,10 +16,15 @@ namespace ManagedMemory
 
         public ProcessInterface(string name)
         {
+            managedProcess = FindProcess(name);
+            handle = Handle.GetProcessHandle(name, APIProxy.ProcessAccessFlags.All);
+        }
+
+        public static Process FindProcess(string name)
+        {
             Process[] procs = Process.GetProcessesByName(name);
-            if (procs.Length != 1) throw new Exception("Process is not unique or does not exist");
-            managedProcess = procs[0];
-            handle = APIProxy.OpenProcess(APIProxy.ProcessAccessFlags.All, managedProcess.Id);
+            if (procs.Length != 1) throw new Exception("process does not exist or is not unique");
+            return procs[0];
         }
 
         /*Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
@@ -64,10 +69,10 @@ namespace ManagedMemory
         {
             MemoryRegion pathRegion = APIProxy.VirtualAllocEx(handle, Address.Zero(), libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
             APIProxy.WriteProcessMemory(handle, pathRegion.start, Encoding.ASCII.GetBytes(libraryPath));
-            Handle kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
-            Address loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
-            Handle threadHandle = APIProxy.CreateRemoteThread(handle, Address.Zero(), 0, loadLibraryPointer, pathRegion.start, 0, 0);
-            FreeMemoryRegion(pathRegion,APIProxy.FreeType.Release);
+            Handle kernelLibraryHandle = Handle.GetModuleHandle("Kernel32.dll");
+            Address loadLibraryAddress = APIProxy.GetProcedureAddress(kernelLibraryHandle, "LoadLibraryA");
+            Handle threadHandle = APIProxy.CreateRemoteThread(handle, Address.Zero(), 0, loadLibraryAddress, pathRegion.start, 0, 0);
+            FreeMemoryRegion(pathRegion, APIProxy.FreeType.Release);
             threadHandle.Close();
         }
 
@@ -83,16 +88,17 @@ namespace ManagedMemory
             return allocation;
         }
 
-        public void FreeMemoryRegion(MemoryRegion region,APIProxy.FreeType freeType)
+        public void FreeMemoryRegion(MemoryRegion region, APIProxy.FreeType freeType)
         {
-            if(freeType == APIProxy.FreeType.Release)
+            if (freeType == APIProxy.FreeType.Release)
             {
                 APIProxy.VirtualFreeEx(handle, region.start, 0, freeType);
-            } else
+            }
+            else
             {
                 APIProxy.VirtualFreeEx(handle, region.start, region.lenght, freeType);
             }
-            
+
         }
 
         protected byte[] API_ReadProcessMemory(Address adr, int size)
@@ -210,8 +216,8 @@ namespace ManagedMemory
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
-                Handle cHandle = new Handle(IntPtr.Zero);
-                cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
+                Handle cHandle = Handle.Zero();
+                cHandle = Handle.GetThreadHandle((uint)pt.Id, APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME);
                 APIProxy.SuspendThread(cHandle);
             }
         }
@@ -220,8 +226,8 @@ namespace ManagedMemory
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
-                Handle cHandle = new Handle(IntPtr.Zero);
-                cHandle = APIProxy.OpenThread(APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME, (uint)pt.Id);
+                Handle cHandle = Handle.Zero();
+                cHandle = Handle.GetThreadHandle((uint)pt.Id, APIProxy.ThreadAccessFlags.THREAD_SUSPEND_RESUME);
                 APIProxy.ResumeThread(cHandle);
             }
         }

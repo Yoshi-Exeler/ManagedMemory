@@ -16,6 +16,11 @@ namespace ManagedMemory
             this.handle = handle;
         }
 
+        public static Handle Zero()
+        {
+            return new Handle(IntPtr.Zero);
+        }
+
         public Handle(IntPtr handle)
         {
             this.handle = (long)handle;
@@ -23,9 +28,8 @@ namespace ManagedMemory
 
         public static Handle GetProcessHandle(string name, APIProxy.ProcessAccessFlags access)
         {
-            Process[] procs = Process.GetProcessesByName(name);
-            if (procs.Length != 1) throw new Exception("process is not unique or does not exist");
-            return APIProxy.OpenProcess(access, procs[0].Id);
+            Process proc = ProcessInterface.FindProcess(name);
+            return APIProxy.OpenProcess(access, proc.Id);
         }
 
         public static Handle GetThreadHandle(uint threadID, APIProxy.ThreadAccessFlags access)
