@@ -222,7 +222,7 @@ namespace ManagedMemory
             {
                 IntPtr cHandle = IntPtr.Zero;
                 cHandle = WINAPI.OpenThread(WINAPI.ThreadAccessFlags.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with Allaccess to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
+                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with 0x2 access to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
                 WINAPI.SuspendThread(cHandle);
             }
         }
@@ -233,7 +233,7 @@ namespace ManagedMemory
             {
                 IntPtr cHandle = IntPtr.Zero;
                 cHandle = WINAPI.OpenThread(WINAPI.ThreadAccessFlags.THREAD_SUSPEND_RESUME, false, (uint)pt.Id);
-                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with Allaccess to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
+                if (cHandle == null) throw new OpenThreadException("Obtaining a handle with 0x2 access to the thread with the ID: " + pt.Id + " has failed with errorcode " + Marshal.GetLastWin32Error());
                 WINAPI.ResumeThread(cHandle);
             }
         }
