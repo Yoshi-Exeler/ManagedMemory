@@ -44,6 +44,7 @@
     <Compile Include="Address.cs" />
     <Compile Include="APIProxy.cs" />
     <Compile Include="ExternalVariable.cs" />
+    <Compile Include="Handle.cs" />
     <Compile Include="MemoryRegion.cs" />
     <Compile Include="Pointer.cs" />
     <Compile Include="PointerPath.cs" />

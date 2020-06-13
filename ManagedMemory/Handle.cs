@@ -8,8 +8,8 @@ namespace ManagedMemory
 {
     public class Handle
     {
-        private long handle;
-        private ProcessInterface callback;
+        protected long handle;
+        protected ProcessInterface callback;
 
         public Handle(long handle, ProcessInterface callback)
         {

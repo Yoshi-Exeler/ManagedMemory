@@ -8,9 +8,9 @@ namespace ManagedMemory
 {
     public class Pointer
     {
-        private Address source;
-        private Address destination;
-        private ProcessInterface callback;
+        protected Address source;
+        protected Address destination;
+        protected ProcessInterface callback;
 
         public Pointer(Address src, ProcessInterface callback)
         {
@@ -19,22 +19,22 @@ namespace ManagedMemory
             destination = new Address(callback.ReadInt64(source));
         }
 
-        public Address getSource()
+        public Address GetSource()
         {
             return source;
         }
 
-        public Address getDestination()
+        public Address GetDestination()
         {
             return destination;
         }
 
-        public void update()
+        public void Update()
         {
             destination = new Address(callback.ReadInt64(source));
         }
 
-        public ExternalVariable getDestinationVariable()
+        public ExternalVariable GetDestinationVariable()
         {
             return new ExternalVariable(destination, callback);
         }

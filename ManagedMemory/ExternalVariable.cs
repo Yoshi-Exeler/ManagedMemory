@@ -8,8 +8,8 @@ namespace ManagedMemory
 {
     public class ExternalVariable
     {
-        private Address address;
-        private ProcessInterface callback;
+        protected Address address;
+        protected ProcessInterface callback;
 
         public ExternalVariable(Address adr, ProcessInterface pi)
         {
@@ -17,14 +17,14 @@ namespace ManagedMemory
             address = adr;
         }
 
-        public Address getAddress()
+        public Address GetAddress()
         {
             return address;
         }
 
-        public uint changeProtection(APIProxy.MemoryProtection newProtection, int sizeOfVariable)
+        public uint ChangeProtection(APIProxy.MemoryProtection newProtection, int sizeOfVariable)
         {
-            return APIProxy.VirtualProtectEx(callback.getHandle(), getAddress().getAsPointer(), sizeOfVariable, (uint)newProtection);
+            return APIProxy.VirtualProtectEx(callback.GetHandle(), GetAddress().GetAsPointer(), sizeOfVariable, (uint)newProtection);
         }
 
         public int GetAsInt32()

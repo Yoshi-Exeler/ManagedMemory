@@ -8,7 +8,7 @@ namespace ManagedMemory
 {
     public class Address
     {
-        private long address;
+        protected long address;
 
         public Address(long adr)
         {
@@ -19,33 +19,33 @@ namespace ManagedMemory
             address = (long)adr;
         }
 
-        public static Address getAddressAtOffset(Address adr, int offset)
+        public static Address GetAddressAtOffset(Address adr, int offset)
         {
-            return new Address(adr.getAddress() + offset);
+            return new Address(adr.GetAddress() + offset);
         }
 
         //returns a new address which is offset by the parameter from the current address
-        public Address offsetBy(int offset)
+        public Address OffsetBy(int offset)
         {
             return new Address(address + offset);
         }
 
-        public long getAddress()
+        public long GetAddress()
         {
             return address;
         }
 
-        public IntPtr getAsPointer()
+        public IntPtr GetAsPointer()
         {
             return (IntPtr)address;
         }
 
-        public void setAddress(long adr)
+        public void SetAddress(long adr)
         {
             address = adr;
         }
 
-        public void setAddress(IntPtr adr)
+        public void SetAddress(IntPtr adr)
         {
             address = (long)adr;
         }

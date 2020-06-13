@@ -11,21 +11,21 @@ namespace ManagedMemory
 {
     public class ProcessInterface
     {
-        private Process managedProcess;
-        private IntPtr handle;
+        protected Process managedProcess;
+        protected IntPtr handle;
 
         public ProcessInterface(string name)
         {
             Process[] procs = Process.GetProcessesByName(name);
             if (procs.Length != 1) throw new Exception("Process is not unique or does not exist");
             managedProcess = procs[0];
-            handle = api_OpenProcess(managedProcess.Id);
+            handle = API_OpenProcess(managedProcess.Id);
         }
 
         /*Searches the module for the specified pattern, then returns the address of the first byte of the pattern offset by the FinalOffset or null if the pattern was not found.
          * In most cases you should simply pass the name of the main modulue for the "module" argument.
          */
-        public Address findPattern(string module, byte[] pattern, string mask, int finalOffset)
+        public Address FindPattern(string module, byte[] pattern, string mask, int finalOffset)
         {
             ProcessModule mod = null;
             foreach (ProcessModule pm in managedProcess.Modules)
@@ -34,7 +34,7 @@ namespace ManagedMemory
             }
             if (mod == null) throw new ArgumentException("The Specified module " + module + " was not found");
             byte[] dump = new byte[mod.ModuleMemorySize];
-            api_ReadProcessMemory(new Address(mod.BaseAddress), dump.Length);
+            API_ReadProcessMemory(new Address(mod.BaseAddress), dump.Length);
             bool found = false;
             long resIndex = -1;
             for (int i = 0; i < dump.Length; i++)
@@ -55,12 +55,12 @@ namespace ManagedMemory
             return new Address((long)mod.BaseAddress + resIndex + finalOffset);
         }
 
-        public IntPtr getHandle()
+        public IntPtr GetHandle()
         {
             return handle;
         }
 
-        public void injectDll(string libraryPath)
+        public void InjectDll(string libraryPath)
         {
             IntPtr pathPointer = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
             APIProxy.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath));
@@ -71,7 +71,7 @@ namespace ManagedMemory
         }
 
 
-        public MemoryRegion allocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion AllocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
             IntPtr allocation = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
             if (allocation == null) throw new Exception("Allocation at an undefinded location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
@@ -81,9 +81,9 @@ namespace ManagedMemory
             return res;
         }
 
-        public MemoryRegion allocateMemoryAt(Address adr, int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion AllocateMemoryAt(Address adr, int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            IntPtr allocation = APIProxy.VirtualAllocEx(handle, adr.getAsPointer(), (IntPtr)size, allocationType, memoryProtection);
+            IntPtr allocation = APIProxy.VirtualAllocEx(handle, adr.GetAsPointer(), (IntPtr)size, allocationType, memoryProtection);
             if (allocation == null) throw new Exception("Allocation at " + adr + " location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion res = new MemoryRegion();
             res.start = new Address(allocation);
@@ -91,29 +91,29 @@ namespace ManagedMemory
             return res;
         }
 
-        private IntPtr api_OpenProcess(int pid)
+        protected IntPtr API_OpenProcess(int pid)
         {
             IntPtr processHandle = APIProxy.OpenProcess(APIProxy.ProcessAccessFlags.All, pid);
             if (processHandle == null) throw new OpenProcessException("Obtaining a handle with Allaccess to the process with the pid " + pid + " has failed with errorcode " + Marshal.GetLastWin32Error());
             return processHandle;
         }
 
-        private byte[] api_ReadProcessMemory(Address adr, int size)
+        protected byte[] API_ReadProcessMemory(Address adr, int size)
         {
-            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            byte[] buffer = APIProxy.ReadProcessMemory(handle, adr.getAsPointer(), size);
-            APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection);
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            byte[] buffer = APIProxy.ReadProcessMemory(handle, adr.GetAsPointer(), size);
+            APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), size, oldProtection);
             return buffer;
         }
 
-        private void api_WriteProcessMemory(Address adr, byte[] val)
+        protected void API_WriteProcessMemory(Address adr, byte[] val)
         {
-            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            APIProxy.WriteProcessMemory(handle, adr.getAsPointer(), val);
-            APIProxy.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection);
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), val.Length, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, adr.GetAsPointer(), val);
+            APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), val.Length, oldProtection);
         }
 
-        public Address getModuleBase(string name)
+        public Address GetModuleBase(string name)
         {
             foreach (ProcessModule pm in managedProcess.Modules)
             {
@@ -122,7 +122,7 @@ namespace ManagedMemory
             return null;
         }
 
-        public ArrayList getLoadedModuleNames()
+        public ArrayList GetLoadedModuleNames()
         {
             ArrayList res = new ArrayList();
             foreach (ProcessModule pm in managedProcess.Modules)
@@ -132,84 +132,84 @@ namespace ManagedMemory
             return res;
         }
 
-        public ProcessModuleCollection getLoadedModules()
+        public ProcessModuleCollection GetLoadedModules()
         {
             return managedProcess.Modules;
         }
 
-        public int getPid()
+        public int GetPid()
         {
             return managedProcess.Id;
         }
 
         public void WriteInt32(Address adr, int val)
         {
-            api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
         public void WriteInt64(Address adr, long val)
         {
-            api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
         public void WriteFloat(Address adr, float val)
         {
-            api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
         public void WriteDouble(Address adr, double val)
         {
-            api_WriteProcessMemory(adr, BitConverter.GetBytes(val));
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
         public void WriteByte(Address adr, byte val)
         {
             byte[] buf = { val };
-            api_WriteProcessMemory(adr, buf);
+            API_WriteProcessMemory(adr, buf);
         }
 
         public void WriteByteArray(Address adr, byte[] val)
         {
-            api_WriteProcessMemory(adr, val);
+            API_WriteProcessMemory(adr, val);
         }
 
         public int ReadInt32(Address adr)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, sizeof(int));
+            byte[] buffer = API_ReadProcessMemory(adr, sizeof(int));
             return BitConverter.ToInt32(buffer, 0);
         }
 
         public long ReadInt64(Address adr)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, sizeof(long));
+            byte[] buffer = API_ReadProcessMemory(adr, sizeof(long));
             return BitConverter.ToInt64(buffer, 0);
         }
 
         public float ReadFloat(Address adr)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, sizeof(float));
+            byte[] buffer = API_ReadProcessMemory(adr, sizeof(float));
             return BitConverter.ToSingle(buffer, 0);
         }
 
         public double ReadDouble(Address adr)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, sizeof(double));
+            byte[] buffer = API_ReadProcessMemory(adr, sizeof(double));
             return BitConverter.ToDouble(buffer, 0);
         }
 
         public byte ReadByte(Address adr)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, 1);
+            byte[] buffer = API_ReadProcessMemory(adr, 1);
             return buffer[0];
         }
 
         public byte[] ReadByteArray(Address adr, int size)
         {
-            byte[] buffer = api_ReadProcessMemory(adr, size);
+            byte[] buffer = API_ReadProcessMemory(adr, size);
             return buffer;
         }
 
-        public void freezeProcess()
+        public void FreezeProcess()
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
@@ -219,7 +219,7 @@ namespace ManagedMemory
             }
         }
 
-        public void unfreezeProcess()
+        public void UnfreezeProcess()
         {
             foreach (ProcessThread pt in managedProcess.Threads)
             {
@@ -229,7 +229,7 @@ namespace ManagedMemory
             }
         }
 
-        public void terminate()
+        public void Terminate()
         {
             managedProcess.Kill();
         }
