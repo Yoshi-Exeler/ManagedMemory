@@ -67,7 +67,7 @@ namespace ManagedMemory
             Handle kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
             Address loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
             Handle threadHandle = APIProxy.CreateRemoteThread(handle, Address.Zero(), 0, loadLibraryPointer, pathRegion.start, 0, 0);
-            FreeMemoryRegion(pathRegion);
+            FreeMemoryRegion(pathRegion,APIProxy.FreeType.Release);
             threadHandle.Close();
         }
 
@@ -83,9 +83,16 @@ namespace ManagedMemory
             return allocation;
         }
 
-        public void FreeMemoryRegion(MemoryRegion region)
+        public void FreeMemoryRegion(MemoryRegion region,APIProxy.FreeType freeType)
         {
-            APIProxy.VirtualFreeEx(handle, region.start, region.lenght, APIProxy.FreeType.Release);
+            if(freeType == APIProxy.FreeType.Release)
+            {
+                APIProxy.VirtualFreeEx(handle, region.start, 0, freeType);
+            } else
+            {
+                APIProxy.VirtualFreeEx(handle, region.start, region.lenght, freeType);
+            }
+            
         }
 
         protected byte[] API_ReadProcessMemory(Address adr, int size)

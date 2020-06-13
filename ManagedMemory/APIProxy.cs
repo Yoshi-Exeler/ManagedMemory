@@ -11,7 +11,7 @@ namespace ManagedMemory
     {
         public static void VirtualFreeEx(Handle processHandle, Address targetAddress, int size, APIProxy.FreeType freeType)
         {
-            if (WINAPI.VirtualFreeEx(processHandle.GetHandleAsPointer(), targetAddress.GetAsPointer(), size, freeType) == false) throw new VirtualFreeException("Freeing " + size + " Byes at " + targetAddress + " failed with errorcode " + Marshal.GetLastWin32Error());
+            if (WINAPI.VirtualFreeEx(processHandle.GetHandleAsPointer(), targetAddress.GetAsPointer(), size, freeType) == false) throw new VirtualFreeException("Freeing  Bytes at " + targetAddress + " failed with errorcode " + Marshal.GetLastWin32Error());
         }
 
         public static Handle GetModuleHandle(string moduleName)
