@@ -9,7 +9,6 @@ namespace ManagedMemory
     public class Address
     {
         protected long address;
-
         public Address(long adr)
         {
             address = adr;
@@ -22,6 +21,11 @@ namespace ManagedMemory
         public static Address GetAddressAtOffset(Address adr, int offset)
         {
             return new Address(adr.GetAddress() + offset);
+        }
+
+        public static Address Zero()
+        {
+            return new Address(IntPtr.Zero);
         }
 
         //returns a new address which is offset by the parameter from the current address

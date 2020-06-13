@@ -21,23 +21,23 @@ namespace ManagedMemory
             if (WINAPI.CloseHandle(handle.GetHandleAsPointer()) == false) throw new CloseHandleException("Closing the handle " + handle + " has failed with errorcode+" + Marshal.GetLastWin32Error());
         }
 
-        public static Handle CreateRemoteThread(Handle processHandle, IntPtr threadAttributesPointer, uint stackSize, IntPtr startAddress, IntPtr parameterPointer, uint creationFlags, IntPtr threadId)
+        public static Handle CreateRemoteThread(Handle processHandle, Address threadAttributesPointer, uint stackSize, Address startAddress, Address parameterPointer, uint creationFlags, int threadId)
         {
-            IntPtr res = WINAPI.CreateRemoteThread(processHandle.GetHandleAsPointer(), threadAttributesPointer, stackSize, startAddress, parameterPointer, creationFlags, threadId);
+            IntPtr res = WINAPI.CreateRemoteThread(processHandle.GetHandleAsPointer(), threadAttributesPointer.GetAsPointer(), stackSize, startAddress.GetAsPointer(), parameterPointer.GetAsPointer(), creationFlags, (IntPtr)threadId);
             if (res == null) throw new CreateRemoteThreadException("Creating a remote thread in the process " + processHandle + " with the threadattributePointer " + threadAttributesPointer + " stacksize " + stackSize + " startaddress " + startAddress + " parameterPointer " + parameterPointer + " creationFlags " + creationFlags + " and threadId " + threadId + " has failed with errorcode " + Marshal.GetLastWin32Error());
             return new Handle(res);
         }
 
-        public static IntPtr GetProcedureAddress(Handle moduleHandle, string procedureName)
+        public static Address GetProcedureAddress(Handle moduleHandle, string procedureName)
         {
             IntPtr res = WINAPI.GetProcAddress(moduleHandle.GetHandleAsPointer(), procedureName);
             if (res == null) throw new GetProcedureAddressException("Getting the procedure address for the procedure named " + procedureName + " in the module with the handle " + moduleHandle + " has failed with errorcode " + Marshal.GetLastWin32Error());
-            return res;
+            return new Address(res);
         }
 
-        public static MemoryRegion VirtualAllocEx(Handle processHandle, IntPtr startAddress, IntPtr size, AllocationType allocationType, MemoryProtection protection)
+        public static MemoryRegion VirtualAllocEx(Handle processHandle, Address startAddress, int size, AllocationType allocationType, MemoryProtection protection)
         {
-            IntPtr res = WINAPI.VirtualAllocEx(processHandle.GetHandleAsPointer(), startAddress, size, allocationType, protection);
+            IntPtr res = WINAPI.VirtualAllocEx(processHandle.GetHandleAsPointer(), startAddress.GetAsPointer(), (IntPtr)size, allocationType, protection);
             if (res == null) throw new VirtualAllocationException("Allocating " + size + " Bytes at " + startAddress + " with the allocationType " + allocationType + " and the protection " + protection + " has failed with errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion region = new MemoryRegion();
             region.start = new Address(res);
@@ -52,24 +52,24 @@ namespace ManagedMemory
             return new Handle(res);
         }
 
-        public static byte[] ReadProcessMemory(Handle processHandle, IntPtr targetAddress, int outputSize)
+        public static byte[] ReadProcessMemory(Handle processHandle, Address targetAddress, int outputSize)
         {
             byte[] buffer = new byte[outputSize];
             long bytesRead = 0;
-            if (WINAPI.ReadProcessMemory(processHandle.GetHandleAsPointer(), targetAddress, buffer, outputSize, ref bytesRead) == false) throw new ReadProcessMemoryException("Reading " + outputSize + " Bytes from " + targetAddress + " has failed with errorcode " + Marshal.GetLastWin32Error());
+            if (WINAPI.ReadProcessMemory(processHandle.GetHandleAsPointer(), targetAddress.GetAsPointer(), buffer, outputSize, ref bytesRead) == false) throw new ReadProcessMemoryException("Reading " + outputSize + " Bytes from " + targetAddress + " has failed with errorcode " + Marshal.GetLastWin32Error());
             return buffer;
         }
 
-        public static void WriteProcessMemory(Handle processHandle, IntPtr targetAddress, byte[] input)
+        public static void WriteProcessMemory(Handle processHandle, Address targetAddress, byte[] input)
         {
             long bytesWritten = 0;
-            if (WINAPI.WriteProcessMemory(processHandle.GetHandleAsPointer(), targetAddress, input, input.Length, ref bytesWritten) == false) throw new WriteProcessMemoryException("Writing " + input.Length + " Bytes to " + targetAddress + " has failed with errorcode " + Marshal.GetLastWin32Error());
+            if (WINAPI.WriteProcessMemory(processHandle.GetHandleAsPointer(), targetAddress.GetAsPointer(), input, input.Length, ref bytesWritten) == false) throw new WriteProcessMemoryException("Writing " + input.Length + " Bytes to " + targetAddress + " has failed with errorcode " + Marshal.GetLastWin32Error());
         }
 
-        public static uint VirtualProtectEx(Handle processHandle, IntPtr regionStart, int regionSize, uint newProtection)
+        public static uint VirtualProtectEx(Handle processHandle, Address regionStart, int regionSize, uint newProtection)
         {
             uint oldProtection = 0;
-            if (WINAPI.VirtualProtectEx(processHandle.GetHandleAsPointer(), regionStart, regionSize, newProtection, out oldProtection) == false) throw new VirtualProtectionException("Protecting " + regionStart + " to " + regionStart + " + " + regionSize + " with the protection " + newProtection + " has failed with errorcode" + Marshal.GetLastWin32Error());
+            if (WINAPI.VirtualProtectEx(processHandle.GetHandleAsPointer(), regionStart.GetAsPointer(), regionSize, newProtection, out oldProtection) == false) throw new VirtualProtectionException("Protecting " + regionStart + " to " + regionStart + " + " + regionSize + " with the protection " + newProtection + " has failed with errorcode" + Marshal.GetLastWin32Error());
             return oldProtection;
         }
 

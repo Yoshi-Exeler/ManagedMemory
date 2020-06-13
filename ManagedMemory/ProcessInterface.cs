@@ -62,39 +62,38 @@ namespace ManagedMemory
 
         public void InjectDll(string libraryPath)
         {
-            MemoryRegion pathRegion = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            APIProxy.WriteProcessMemory(handle, pathRegion.start.GetAsPointer(), Encoding.ASCII.GetBytes(libraryPath));
+            MemoryRegion pathRegion = APIProxy.VirtualAllocEx(handle, Address.Zero(), libraryPath.Length, APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, pathRegion.start, Encoding.ASCII.GetBytes(libraryPath));
             Handle kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
-            IntPtr loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
-            Handle threadHandle = APIProxy.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathRegion.start.GetAsPointer(), 0, IntPtr.Zero);
-            threadHandle.Close();
+            Address loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
+            Handle threadHandle = APIProxy.CreateRemoteThread(handle, Address.Zero(), 0, loadLibraryPointer, pathRegion.start, 0, 0);
         }
 
         public MemoryRegion AllocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
+            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, Address.Zero(), size, allocationType, memoryProtection);
             return allocation;
         }
 
         public MemoryRegion AllocateMemoryAt(Address adr, int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
-            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, adr.GetAsPointer(), (IntPtr)size, allocationType, memoryProtection);
+            MemoryRegion allocation = APIProxy.VirtualAllocEx(handle, adr, size, allocationType, memoryProtection);
             return allocation;
         }
 
         protected byte[] API_ReadProcessMemory(Address adr, int size)
         {
-            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            byte[] buffer = APIProxy.ReadProcessMemory(handle, adr.GetAsPointer(), size);
-            APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), size, oldProtection);
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr, size, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            byte[] buffer = APIProxy.ReadProcessMemory(handle, adr, size);
+            APIProxy.VirtualProtectEx(handle, adr, size, oldProtection);
             return buffer;
         }
 
         protected void API_WriteProcessMemory(Address adr, byte[] val)
         {
-            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), val.Length, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            APIProxy.WriteProcessMemory(handle, adr.GetAsPointer(), val);
-            APIProxy.VirtualProtectEx(handle, adr.GetAsPointer(), val.Length, oldProtection);
+            uint oldProtection = APIProxy.VirtualProtectEx(handle, adr, val.Length, (uint)APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
+            APIProxy.WriteProcessMemory(handle, adr, val);
+            APIProxy.VirtualProtectEx(handle, adr, val.Length, oldProtection);
         }
 
         public Address GetModuleBase(string name)

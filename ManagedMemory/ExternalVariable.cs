@@ -24,7 +24,7 @@ namespace ManagedMemory
 
         public uint ChangeProtection(APIProxy.MemoryProtection newProtection, int sizeOfVariable)
         {
-            return APIProxy.VirtualProtectEx(callback.GetHandle(), GetAddress().GetAsPointer(), sizeOfVariable, (uint)newProtection);
+            return APIProxy.VirtualProtectEx(callback.GetHandle(), GetAddress(), sizeOfVariable, (uint)newProtection);
         }
 
         public int GetAsInt32()
