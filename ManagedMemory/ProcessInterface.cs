@@ -73,20 +73,20 @@ namespace ManagedMemory
         }
 
 
-        public MemoryRegion allocateMemory(int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit,WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion allocateMemory(int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
             IntPtr allocation = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
-            if (allocation == null) throw new Exception("allocation failed");
+            if (allocation == null) throw new Exception("Allocation at an undefinded location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion res = new MemoryRegion();
             res.start = new Address(allocation);
             res.lenght = size;
             return res;
         }
 
-        public MemoryRegion allocateMemoryAt(Address adr,int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        public MemoryRegion allocateMemoryAt(Address adr, int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
         {
             IntPtr allocation = WINAPI.VirtualAllocEx(handle, adr.getAsPointer(), (IntPtr)size, allocationType, memoryProtection);
-            if (allocation == null) throw new Exception("allocation failed");
+            if (allocation == null) throw new Exception("Allocation at " + adr + " location for " + size + " Bytes  with  allocationType " + allocationType + " and memoryProtection " + memoryProtection + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             MemoryRegion res = new MemoryRegion();
             res.start = new Address(allocation);
             res.lenght = size;
