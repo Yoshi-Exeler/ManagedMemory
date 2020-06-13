@@ -103,7 +103,7 @@ namespace ManagedMemory
         public static extern bool VirtualProtectEx(IntPtr processHandle, IntPtr regionStart, int regionSize, uint newProtection, out uint oldProtection);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenThread(ProcessAccessFlags desiredAccess, bool inheritHandle, uint threadID);
+        public static extern IntPtr OpenThread(ThreadAccessFlags desiredAccess, bool inheritHandle, uint threadID);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern uint SuspendThread(IntPtr threadHandle);
