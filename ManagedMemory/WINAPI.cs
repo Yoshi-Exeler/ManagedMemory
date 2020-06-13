@@ -13,6 +13,20 @@ namespace ManagedMemory
     public class WINAPI
     {
         [Flags]
+        public enum ThreadAccessFlags : uint
+        {
+            THREAD_TERMINATE = 0x1,
+            THREAD_SUSPEND_RESUME = 0x2,
+            THREAD_GET_CONTEXT = 0x8,
+            THREAD_SET_CONTEXT = 0x10,
+            THREAD_SET_INFORMATION = 0x20,
+            THREAD_SET_THREAD_TOKEN = 0x80,
+            THREAD_IMPERSONATE = 0x100,
+            THREAD_DIRECT_IMPERSONATION = 0x200,
+            THREAD_SET_LIMITED_INFORMATION = 0x400,
+        };
+
+        [Flags]
         public enum MemoryProtection : uint
         {
             PAGE_NO_ACCESS = 0x1,
