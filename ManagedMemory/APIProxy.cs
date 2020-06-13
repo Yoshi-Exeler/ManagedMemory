@@ -45,7 +45,7 @@ namespace ManagedMemory
         public static IntPtr OpenProcess(ProcessAccessFlags accessFlags, int processId)
         {
             IntPtr res = WINAPI.OpenProcess(accessFlags, false, processId);
-            if (res == null) throw new OpenProcessException("Getting a handle with "+accessFlags+" access to the process with the id " + processId + " has failed with errorcode " + Marshal.GetLastWin32Error());
+            if (res == null) throw new OpenProcessException("Getting a handle with " + accessFlags + " access to the process with the id " + processId + " has failed with errorcode " + Marshal.GetLastWin32Error());
             return res;
         }
 
@@ -60,7 +60,7 @@ namespace ManagedMemory
         public static void WriteProcessMemory(IntPtr processHandle, IntPtr targetAddress, byte[] input)
         {
             long bytesWritten = 0;
-            if (WINAPI.WriteProcessMemory(processHandle, targetAddress, input, input.Length, ref bytesWritten) == false) throw new WriteProcessMemoryException("Writing "+input.Length+" Bytes to "+targetAddress+" has failed with errorcode "+Marshal.GetLastWin32Error());
+            if (WINAPI.WriteProcessMemory(processHandle, targetAddress, input, input.Length, ref bytesWritten) == false) throw new WriteProcessMemoryException("Writing " + input.Length + " Bytes to " + targetAddress + " has failed with errorcode " + Marshal.GetLastWin32Error());
         }
 
         public static uint VirtualProtectEx(IntPtr processHandle, IntPtr regionStart, int regionSize, uint newProtection)
@@ -73,7 +73,7 @@ namespace ManagedMemory
         public static IntPtr OpenThread(ThreadAccessFlags desiredAccess, uint threadID)
         {
             IntPtr res = WINAPI.OpenThread(desiredAccess, false, threadID);
-            if (res == null) throw new OpenThreadException("Getting a handle with "+desiredAccess+" access for the thread with the id "+threadID+" has failed with errorcode"+Marshal.GetLastWin32Error());
+            if (res == null) throw new OpenThreadException("Getting a handle with " + desiredAccess + " access for the thread with the id " + threadID + " has failed with errorcode" + Marshal.GetLastWin32Error());
             return res;
         }
 
