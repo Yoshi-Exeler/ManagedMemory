@@ -25,4 +25,6 @@ namespace ManagedMemory
     public class GetModuleHandleException : Exception { public GetModuleHandleException(string ex) : base(ex) { } }
 
     public class GetProcedureAddressException : Exception { public GetProcedureAddressException(string ex) : base(ex) { } }
+
+    public class GetProcessIDFromThreadException : Exception { public GetProcessIDFromThreadException(string ex) : base(ex) { } }
 }

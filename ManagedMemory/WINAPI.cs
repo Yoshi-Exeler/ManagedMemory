@@ -12,6 +12,9 @@ namespace ManagedMemory
 {
     internal class WINAPI
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern uint GetProcessIdOfThread(IntPtr handle);
+
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
         public static extern IntPtr GetModuleHandle(string moduleName);
 

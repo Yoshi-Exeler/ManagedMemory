@@ -87,6 +87,13 @@ namespace ManagedMemory
             WINAPI.ResumeThread(threadHandle);
         }
 
+        public static uint GetProcessIDFromThread(IntPtr threadHandle)
+        {
+            uint res = WINAPI.GetProcessIdOfThread(threadHandle);
+            if (res == 0) throw new GetProcessIDFromThreadException("Getting the process id of the process belonging to the thread with the handle " + threadHandle + " has failed with errorcode " + Marshal.GetLastWin32Error());
+            return res;
+        }
+
 
 
         [Flags]
