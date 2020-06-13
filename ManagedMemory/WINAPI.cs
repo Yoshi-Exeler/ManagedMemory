@@ -15,8 +15,6 @@ namespace ManagedMemory
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, APIProxy.FreeType dwFreeType);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern uint GetProcessIdOfThread(IntPtr handle);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
         public static extern IntPtr GetModuleHandle(string moduleName);

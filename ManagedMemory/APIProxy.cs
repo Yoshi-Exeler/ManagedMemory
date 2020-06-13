@@ -95,13 +95,6 @@ namespace ManagedMemory
             WINAPI.ResumeThread(threadHandle.GetHandleAsPointer());
         }
 
-        public static uint GetProcessIDFromThread(Handle threadHandle)
-        {
-            uint res = WINAPI.GetProcessIdOfThread(threadHandle.GetHandleAsPointer());
-            if (res == 0) throw new GetProcessIDFromThreadException("Getting the process id of the process belonging to the thread with the handle " + threadHandle + " has failed with errorcode " + Marshal.GetLastWin32Error());
-            return res;
-        }
-
         [Flags]
         public enum FreeType
         {
