@@ -67,6 +67,8 @@ namespace ManagedMemory
             Handle kernelDllPointer = APIProxy.GetModuleHandle("Kernel32.dll");
             Address loadLibraryPointer = APIProxy.GetProcedureAddress(kernelDllPointer, "LoadLibraryA");
             Handle threadHandle = APIProxy.CreateRemoteThread(handle, Address.Zero(), 0, loadLibraryPointer, pathRegion.start, 0, 0);
+            FreeMemoryRegion(pathRegion);
+            threadHandle.Close();
         }
 
         public MemoryRegion AllocateMemory(int size, APIProxy.AllocationType allocationType = APIProxy.AllocationType.Reserve | APIProxy.AllocationType.Commit, APIProxy.MemoryProtection memoryProtection = APIProxy.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
