@@ -72,6 +72,27 @@ namespace ManagedMemory
             if (WINAPI.CloseHandle(threadHandle) == false) throw new AccessViolationException();
         }
 
+
+        public MemoryRegion allocateMemory(int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit,WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        {
+            IntPtr allocation = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)size, allocationType, memoryProtection);
+            if (allocation == null) throw new Exception("allocation failed");
+            MemoryRegion res = new MemoryRegion();
+            res.start = new Address(allocation);
+            res.lenght = size;
+            return res;
+        }
+
+        public MemoryRegion allocateMemoryAt(Address adr,int size, WINAPI.AllocationType allocationType = WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection memoryProtection = WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE)
+        {
+            IntPtr allocation = WINAPI.VirtualAllocEx(handle, adr.getAsPointer(), (IntPtr)size, allocationType, memoryProtection);
+            if (allocation == null) throw new Exception("allocation failed");
+            MemoryRegion res = new MemoryRegion();
+            res.start = new Address(allocation);
+            res.lenght = size;
+            return res;
+        }
+
         private IntPtr api_OpenProcess(int pid)
         {
             return WINAPI.OpenProcess(WINAPI.ProcessAccessFlags.All, false, pid);
