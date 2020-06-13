@@ -63,13 +63,13 @@ namespace ManagedMemory
         public void injectDll(string libraryPath)
         {
             IntPtr pathPointer = WINAPI.VirtualAllocEx(handle, IntPtr.Zero, (IntPtr)libraryPath.Length, WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit, WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE);
-            if (pathPointer == null) throw new AccessViolationException();
+            if (pathPointer == null) throw new Exception("Allocation at an undefinded location for " + libraryPath.Length + " Bytes  with  allocationType " + (WINAPI.AllocationType.Reserve | WINAPI.AllocationType.Commit) + " and memoryProtection " + WINAPI.MemoryProtection.PAGE_EXECUTE_READ_WRITE + " has failed with the errorcode " + Marshal.GetLastWin32Error());
             long bytesWritten = 0;
-            if (WINAPI.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath), Encoding.ASCII.GetBytes(libraryPath).Length, ref bytesWritten) == false) throw new AccessViolationException();
+            if (WINAPI.WriteProcessMemory(handle, pathPointer, Encoding.ASCII.GetBytes(libraryPath), Encoding.ASCII.GetBytes(libraryPath).Length, ref bytesWritten) == false) throw new AccessViolationException("Writing "+libraryPath.Length+" Bytes to "+new Address(pathPointer)+" has failed with the errorcode "+Marshal.GetLastWin32Error());
             IntPtr kernelDllPointer = WINAPI.GetModuleHandle("Kernel32.dll");
             IntPtr loadLibraryPointer = WINAPI.GetProcAddress(kernelDllPointer, "LoadLibraryA");
             IntPtr threadHandle = WINAPI.CreateRemoteThread(handle, IntPtr.Zero, 0, loadLibraryPointer, pathPointer, 0, IntPtr.Zero);
-            if (WINAPI.CloseHandle(threadHandle) == false) throw new AccessViolationException();
+            if (WINAPI.CloseHandle(threadHandle) == false) throw new Exception("Closing the handle " + threadHandle + " has failed with the errorcode " + Marshal.GetLastWin32Error());
         }
 
 
@@ -101,21 +101,21 @@ namespace ManagedMemory
         private byte[] api_ReadProcessMemory(Address adr, int size)
         {
             uint oldProtection;
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection) == false) throw new AccessViolationException();
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, 0x40, out oldProtection) == false) throw new Exception("Changing the protection of "+adr+" to 0x40 has failed with the errorcode "+Marshal.GetLastWin32Error());
             byte[] array = new byte[size];
             long numRead = 0;
-            if (WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead) == false) throw new AccessViolationException();
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection) == false) throw new AccessViolationException();
+            if (WINAPI.ReadProcessMemory(handle, adr.getAsPointer(), array, size, ref numRead) == false) throw new Exception("Reading "+size+" Bytes from "+adr+" has failed with the errorcode"+Marshal.GetLastWin32Error());
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), size, oldProtection, out oldProtection) == false) throw new Exception("Reverting the protection of "+adr+" back to its previous protection has failed with the errorcode"+Marshal.GetLastWin32Error());
             return array;
         }
 
         private void api_WriteProcessMemory(Address adr, byte[] val)
         {
             uint oldProtection;
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection) == false) throw new AccessViolationException();
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, 0x40, out oldProtection) == false) throw new Exception("Changing the protection of " + adr + " to 0x40 has failed with the errorcode " + Marshal.GetLastWin32Error());
             long numWritten = 0;
-            if (WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten) == false) throw new AccessViolationException();
-            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection) == false) throw new AccessViolationException();
+            if (WINAPI.WriteProcessMemory(handle, adr.getAsPointer(), val, val.Length, ref numWritten) == false) throw new Exception("Writing "+val.Length+" Bytes to "+adr+" has failed with the errorcode"+Marshal.GetLastWin32Error());
+            if (WINAPI.VirtualProtectEx(handle, adr.getAsPointer(), val.Length, oldProtection, out oldProtection) == false) throw new Exception("Reverting the protection of " + adr + " back to its previous protection has failed with the errorcode" + Marshal.GetLastWin32Error());
         }
 
         public Address getModuleBase(string name)
