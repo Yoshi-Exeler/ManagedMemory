@@ -8,7 +8,7 @@ This library is made to interact only with 64Bit processes. <br>
 # Features
 ° Read and write process memory <br>
 ° Change memory protection <br>
-° Allocate and free new memory regions <br>
+° Allocate and free memory regions <br>
 ° Patternscanning with masking <br>
 ° Native DLL injection <br>
 ° APIProxy that makes Windows API calls availabe while also forwarding their errors properly <br>
