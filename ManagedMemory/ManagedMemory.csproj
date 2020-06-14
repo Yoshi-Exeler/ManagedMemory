@@ -43,14 +43,22 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="APIProxy.cs" />
+    <Compile Include="DataPropertyNode.cs" />
     <Compile Include="ExternalVariable.cs" />
+    <Compile Include="GraphRootNode.cs" />
     <Compile Include="Handle.cs" />
+    <Compile Include="MemoryGraph.cs" />
+    <Compile Include="MemoryGraphNode.cs" />
+    <Compile Include="ModuleBaseNode.cs" />
+    <Compile Include="PointerPropertyNode.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="Pointer.cs" />
     <Compile Include="PointerPath.cs" />
     <Compile Include="ProcessInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="StructureBaseNode.cs" />
+    <Compile Include="StructurePropertyNode.cs" />
     <Compile Include="WINAPI.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
