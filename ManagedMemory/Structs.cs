@@ -12,6 +12,17 @@ namespace ManagedMemory
         public int lenght;
     }
 
+    public struct PathAnalysisResult
+    {
+        public PointerPath path;
+        public string strPath;
+        public int length;
+        public MemoryGraphNode[] pathNodes;
+        public bool foundShorterPath;
+        public string shortestPath;
+        public MemoryGraphNode highestExclusiveNode;
+    }
+
     public struct Vec2D
     {
         public float x, y;
