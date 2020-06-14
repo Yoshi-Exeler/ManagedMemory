@@ -165,6 +165,27 @@ namespace ManagedMemory
             API_WriteProcessMemory(adr, BitConverter.GetBytes(val));
         }
 
+        public void WriteVec2D(Address adr, Vec2D val)
+        {
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val.x));
+            API_WriteProcessMemory(adr.OffsetBy(4), BitConverter.GetBytes(val.y));
+        }
+
+        public void WriteVec3D(Address adr,Vec3D val)
+        {
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val.x));
+            API_WriteProcessMemory(adr.OffsetBy(4), BitConverter.GetBytes(val.y));
+            API_WriteProcessMemory(adr.OffsetBy(8), BitConverter.GetBytes(val.z));
+        }
+
+        public void WriteVec4D(Address adr,Vec4D val)
+        {
+            API_WriteProcessMemory(adr, BitConverter.GetBytes(val.x));
+            API_WriteProcessMemory(adr.OffsetBy(4), BitConverter.GetBytes(val.y));
+            API_WriteProcessMemory(adr.OffsetBy(8), BitConverter.GetBytes(val.z));
+            API_WriteProcessMemory(adr.OffsetBy(12), BitConverter.GetBytes(val.w));
+        }
+
         public void WriteByte(Address adr, byte val)
         {
             byte[] buf = { val };
@@ -198,6 +219,42 @@ namespace ManagedMemory
         {
             byte[] buffer = API_ReadProcessMemory(adr, sizeof(double));
             return BitConverter.ToDouble(buffer, 0);
+        }
+
+        public Vec2D ReadVec2D(Address adr)
+        {
+            byte[] bufferX = API_ReadProcessMemory(adr, sizeof(float));
+            byte[] bufferY = API_ReadProcessMemory(adr.OffsetBy(4), sizeof(float));
+            Vec2D res = new Vec2D();
+            res.x = BitConverter.ToSingle(bufferX, 0);
+            res.y = BitConverter.ToSingle(bufferY, 0);
+            return res;
+        }
+
+        public Vec3D ReadVec3D(Address adr)
+        {
+            byte[] bufferX = API_ReadProcessMemory(adr, sizeof(float));
+            byte[] bufferY = API_ReadProcessMemory(adr.OffsetBy(4), sizeof(float));
+            byte[] bufferZ = API_ReadProcessMemory(adr.OffsetBy(8), sizeof(float));
+            Vec3D res = new Vec3D();
+            res.x = BitConverter.ToSingle(bufferX, 0);
+            res.y = BitConverter.ToSingle(bufferY, 0);
+            res.z = BitConverter.ToSingle(bufferZ, 0);
+            return res;
+        }
+
+        public Vec4D ReadVec4D(Address adr)
+        {
+            byte[] bufferX = API_ReadProcessMemory(adr, sizeof(float));
+            byte[] bufferY = API_ReadProcessMemory(adr.OffsetBy(4), sizeof(float));
+            byte[] bufferZ = API_ReadProcessMemory(adr.OffsetBy(8), sizeof(float));
+            byte[] bufferW = API_ReadProcessMemory(adr.OffsetBy(12), sizeof(float));
+            Vec4D res = new Vec4D();
+            res.x = BitConverter.ToSingle(bufferX, 0);
+            res.y = BitConverter.ToSingle(bufferY, 0);
+            res.z = BitConverter.ToSingle(bufferZ, 0);
+            res.w = BitConverter.ToSingle(bufferW, 0);
+            return res;
         }
 
         public byte ReadByte(Address adr)

@@ -47,6 +47,21 @@ namespace ManagedMemory
             return callback.ReadDouble(address);
         }
 
+        public Vec2D GetAsVec2D()
+        {
+            return callback.ReadVec2D(address);
+        }
+
+        public Vec3D GetAsVec3D()
+        {
+            return callback.ReadVec3D(address);
+        }
+
+        public Vec4D GetAsVec4D()
+        {
+            return callback.ReadVec4D(address);
+        }
+
         public byte GetAsByte()
         {
             return callback.ReadByte(address);
@@ -75,6 +90,21 @@ namespace ManagedMemory
         public void WriteDouble(double val)
         {
             callback.WriteDouble(address, val);
+        }
+
+        public void WriteVec2D(Vec2D val)
+        {
+            callback.WriteVec2D(address,val);
+        }
+
+        public void WriteVec3D(Vec3D val)
+        {
+            callback.WriteVec3D(address, val);
+        }
+
+        public void WriteVec4D(Vec4D val)
+        {
+            callback.WriteVec4D(address, val);
         }
 
         public void WriteByte(byte val)
